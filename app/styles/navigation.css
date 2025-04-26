@@ -1,0 +1,36 @@
+#full-navigation{
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+}
+
+.navigation{
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+}
+
+.nav-item{
+    display: inline;
+    list-style-type: none;
+    margin: 20px;
+}
+
+.nav-item > .link{
+    color: black;
+    text-decoration: none;
+    border: 2px solid blue;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.nav-item > .link:hover{
+    background-color: blue;
+    color: white;
+}
+
+#nav-title{
+    display: inline;
+    text-align: center;
+    margin: 100px;
+}
