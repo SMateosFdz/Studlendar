@@ -1,0 +1,60 @@
+:root{
+    background-color: rgb(220, 226, 253);
+    text-align: center;
+}
+
+h1{
+    text-align: center;
+    color: rgb(4, 0, 250);
+}
+
+h2{
+    text-align: center;
+}
+
+#sessionForm{
+    width: fit-content;
+    border-radius: 10px;
+    background-color: rgb(114, 124, 255);
+    margin: auto;
+}
+
+form{
+    text-align: center;
+}
+
+form input{
+    margin: 10px;
+    border-radius: 10px;
+    display: block;
+}
+
+form label{
+    display: inline;
+    color: white;
+    float: left;
+    margin: 10px;
+}
+
+form fieldset{
+    display: inline;
+    border: 0 none;
+    float: right;
+}
+
+form input[type="radio"]{
+    display: inline;
+}
+
+form span{
+    display: inline;
+    color: white;
+}
+
+button{
+    background-color: rgb(114, 124, 255);
+    color: white;
+    border-radius: 10px;
+    padding: 5px;
+    margin: 10px auto;
+}
