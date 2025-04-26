@@ -13,24 +13,11 @@ h2{
 }
 
 #sessionForm{
-    width: 40%;
+    width: 50%;
     border-radius: 10px;
     background-color: rgb(114, 124, 255);
     margin: auto;
     padding: 15px;
-}
-
-form{
-    text-align: center;
-}
-
-form input{
-    margin: 10px;
-    border-radius: 10px;
-}
-
-form input[type="radio"]{
-    display: inline;
 }
 
 form input[type="reset"], form input[type="submit"]{
@@ -72,4 +59,3 @@ fieldset label{
 hr{
     clear: both;
 }
-

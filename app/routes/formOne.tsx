@@ -13,21 +13,21 @@ export default function FormOne() {
         </label>
         <fieldset id="curva-olvido">
           <input type="radio" required value="si" name="curva-olvido"></input>
-          <span>Sí</span>
+          <label>Sí</label>
           <input type="radio" required value="no" name="curva-olvido"></input>
-          <span>No</span>
+          <label>No</label>
         </fieldset>
-        <br></br>
+        <hr></hr>
         <label htmlFor="pomodoro">
           ¿Quieres complementar los bloques con el método Pomodoro?
         </label>
         <fieldset id="pomodoro">
           <input type="radio" value="si" name="pomodoro"></input>
-          <span>Sí</span>
+          <label>Sí</label>
           <input type="radio" value="no" name="pomodoro"></input>
-          <span>No</span>
+          <label>No</label>
         </fieldset>
-        <br></br>
+        <hr></hr>
         <input type="reset" value="Reiniciar formulario"></input>
         <input type="submit" value="Guardar e ir al siguiente paso"></input>
       </Form>
@@ -36,7 +36,7 @@ export default function FormOne() {
 }
 
 export async function action() {
-    return redirect("/formTwo");
+  return redirect("/formTwo");
 }
 
 export function links() {
