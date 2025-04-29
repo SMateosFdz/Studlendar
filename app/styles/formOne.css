@@ -13,7 +13,7 @@ h2{
 }
 
 #sessionForm{
-    width: 40%;
+    width: 50%;
     border-radius: 10px;
     background-color: rgb(114, 124, 255);
     margin: auto;
@@ -51,17 +51,43 @@ form input[type="reset"]:hover, form input[type="submit"]:hover{
     border-radius: 10px;
 }
 
-form label{
+form input[type="reset"]:disabled, form input[type="submit"]:disabled{
+    background-color: grey;
+    color: white;
+    border: 1px solid rgb(114, 124, 255);
+    padding: 5px;
+    margin: 10px;
+    border-radius: 10px;
+    cursor: not-allowed;
+}
+
+label{
     display: inline;
     color: white;
     float: left;
     margin: 20px;
 }
 
+a{
+    float: right;
+    margin: 20px;
+    text-decoration: none;
+    text-align: center;
+    color: white;
+    padding: 2px 5px;
+    border: 1px solid white;
+    border-radius: 10px;
+}
+
 fieldset{
     margin: auto;
     text-align: right;
     border: 0 none;
+    margin: 20px;
+}
+
+form button{
+    float: right;
     margin: 20px;
 }
 

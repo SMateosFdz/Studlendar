@@ -38,12 +38,6 @@ form input[type="reset"]:hover, form input[type="submit"]:hover{
     border-radius: 10px;
 }
 
-form input:not([type="reset"], [type="submit"], [type="radio"]), form select{
-    float: right;
-    margin: 20px;
-    width: 200px;
-}
-
 form label{
     display: inline;
     color: white;
