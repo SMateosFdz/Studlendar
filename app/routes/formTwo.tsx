@@ -1,4 +1,6 @@
-import { Form  } from "@remix-run/react";
+import type { ActionFunctionArgs} from "@remix-run/node";
+import { redirect } from "@remix-run/node";
+import { Form } from "@remix-run/react";
 
 import styles from "~/styles/formTwo.css";
 
@@ -6,73 +8,66 @@ export default function FormOne() {
   return (
     <>
       <h1>Bienvenido a Studlendar</h1>
-      <h2>Configuración de notificaciones</h2>
+      <h2>Nueva asignatura</h2>
       <Form method="post" id="sessionForm">
-        <label htmlFor="not-rev-diaria">
-          Notificaciones revisión diaria
+        <label htmlFor="name">Nombre de la asignatura</label>
+        <input type="text" id="name" ></input>
+        <hr></hr>
+        <label htmlFor="name">
+          ¿Cuántas horas a la semana quieres enfocarte en el estudio?
         </label>
-        <fieldset id="not-rev-diaria">
-          <input type="radio" value="si" name="not-rev-diaria"></input>
-          <label>Sí</label>
-          <input type="radio" value="no" name="not-rev-diaria"></input>
-          <label>No</label>
+        <input type="number" id="name" min={1} ></input>
+        <hr></hr>
+        <label htmlFor="sesiones">Tamaño de las sesiones de estudio</label>
+        <fieldset id="sesiones">
+          <input type="radio" value="1" name="sesiones"></input>
+          <label>1h</label>
+          <input type="radio" value="2" name="sesiones"></input>
+          <label>2h</label>
+          <input type="radio" value="3" name="sesiones"></input>
+          <label>3h</label>
+          <input type="radio" value="otro" name="sesiones"></input>
+          <label>Otro</label>
         </fieldset>
         <hr></hr>
-        <label htmlFor="not-rev-semanal">
-          Notificaciones revisión y feedback semanal
-        </label>
-        <fieldset id="not-rev-semanal">
-          <input type="radio" value="si" name="not-rev-semanal"></input>
-          <label>Sí</label>
-          <input type="radio" value="no" name="not-rev-semanal"></input>
-          <label>No</label>
-        </fieldset>
+        <label htmlFor="org-sesiones">Organización de las sesiones de estudio</label>
+        <select name="org-sesiones" id="org-sesiones">
+          <option value="volvo">Por día</option>
+          <option value="saab">Día antes</option>
+          <option value="mercedes">Día después</option>
+        </select>
         <hr></hr>
-        <label htmlFor="not-comienzo-bloque">
-          Notificaciones de comienzo de bloques de estudio
+        <label htmlFor="fecha-inicio">
+          Fecha de inicio de la asignatura
         </label>
-        <fieldset id="not-comienzo-bloque">
-          <input type="radio" value="si" name="not-comienzo-bloque"></input>
-          <label>Sí</label>
-          <input type="radio" value="no" name="not-comienzo-bloque"></input>
-          <label>No</label>
-        </fieldset>
+        <input type="date" id="fecha-inicio" ></input>
         <hr></hr>
-        <label htmlFor="not-comp">
-          Notificaciones sobre compensación de bloques no completados
+        <label htmlFor="fecha-fin">
+          Fecha de fin de la asignatura
         </label>
-        <fieldset id="not-comp">
-          <input type="radio" value="si" name="not-comp"></input>
-          <label>Sí</label>
-          <input type="radio" value="no" name="not-comp"></input>
-          <label>No</label>
-        </fieldset>
-        <hr></hr>
-        <label htmlFor="not-periodo-est">
-          Notificaciones durante períodos de estudio
-        </label>
-        <fieldset id="not-periodo-est">
-          <input type="radio" value="si" name="not-periodo-est"></input>
-          <label>Sí</label>
-          <input type="radio" value="no" name="not-periodo-est"></input>
-          <label>No</label>
-        </fieldset>
-        <hr></hr>
-        <label htmlFor="not-descansos">
-          Notificaciones para descansos
-        </label>
-        <fieldset id="not-descansos">
-          <input type="radio" value="si" name="not-descansos"></input>
-          <label>Sí</label>
-          <input type="radio" value="no" name="not-descansos"></input>
-          <label>No</label>
-        </fieldset>
+        <input type="date" id="fecha-fin" ></input>
         <hr></hr>
         <input type="reset" value="Reiniciar formulario"></input>
-        <input type="submit" value="Guardar e ir al siguiente paso"></input>
+        <input type="submit" name="return" value="Guardar y crear una nueva asignatura"></input>
+        <input type="submit" name="return" value="Guardar y volver al formulario"></input>
       </Form>
     </>
   );
+}
+
+export async function action( {request}: ActionFunctionArgs) {
+  const formData = await request.formData();
+  const intent = formData.get("return");
+
+  if(intent === "Guardar y crear una nueva asignatura"){
+    return redirect("/formTwo");
+  }
+
+  if(intent === "Guardar y volver al formulario"){
+    return redirect("/formOne");
+  }
+
+  throw new Error("Acción desconocida");
 }
 
 export function links() {
