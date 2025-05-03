@@ -1,20 +1,18 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
-import { Form, Link, redirect } from "@remix-run/react";
+import { Form, Link, redirect, useLoaderData } from "@remix-run/react";
 import React from "react";
+import { getStoredSubjects } from "~/data/subjects";
 
 import styles from "~/styles/formOne.css";
 
-let number = 0;
-let prueba = "";
+export async function loader(){
+  const existingSubjects = await getStoredSubjects();
 
-function handleClick() {
-  number++;
-  console.log(number);
+  return existingSubjects.length;
 }
 
 export default function FormOne() {
-  
-  sessionStorage.setItem(prueba, number.toString());
+  const number = useLoaderData();
 
   return (
     <>
@@ -22,7 +20,7 @@ export default function FormOne() {
       <h2>Formulario inicial</h2>
       <div id="sessionForm">
         <label htmlFor="nueva-asignatura">Crear una nueva asignatura:</label>
-        <Link to="/formTwo" onClick={handleClick}>
+        <Link to="/formTwo">
           +
         </Link>
         <hr></hr>
@@ -73,9 +71,11 @@ export default function FormOne() {
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const intent = formData.get("move");
+  const existingSubjects = await getStoredSubjects();
+  const number = existingSubjects.length;
 
   if (intent === "Guardar e ir al siguiente paso") {
-    if (prueba !== "0") {
+    if (number !== 0) {
       return redirect("/formFour");
     } else {
       console.log(

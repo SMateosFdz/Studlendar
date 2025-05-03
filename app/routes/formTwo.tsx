@@ -1,6 +1,7 @@
 import type { ActionFunctionArgs} from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form } from "@remix-run/react";
+import { getStoredSubjects, storeSubjects } from "~/data/subjects";
 
 import styles from "~/styles/formTwo.css";
 
@@ -11,15 +12,15 @@ export default function FormOne() {
       <h2>Nueva asignatura</h2>
       <Form method="post" id="sessionForm">
         <label htmlFor="name">Nombre de la asignatura</label>
-        <input type="text" id="name" ></input>
+        <input type="text" id="name" name="name" ></input>
         <hr></hr>
-        <label htmlFor="name">
+        <label htmlFor="horas">
           ¿Cuántas horas a la semana quieres enfocarte en el estudio?
         </label>
-        <input type="number" id="name" min={1} ></input>
+        <input type="number" id="horas" name="horas" min={1} ></input>
         <hr></hr>
         <label htmlFor="sesiones">Tamaño de las sesiones de estudio</label>
-        <fieldset id="sesiones">
+        <fieldset id="sesiones" name="sesiones">
           <input type="radio" value="1" name="sesiones"></input>
           <label>1h</label>
           <input type="radio" value="2" name="sesiones"></input>
@@ -32,20 +33,20 @@ export default function FormOne() {
         <hr></hr>
         <label htmlFor="org-sesiones">Organización de las sesiones de estudio</label>
         <select name="org-sesiones" id="org-sesiones">
-          <option value="volvo">Por día</option>
-          <option value="saab">Día antes</option>
-          <option value="mercedes">Día después</option>
+          <option value="por-dia">Por día</option>
+          <option value="dia-antes">Día antes</option>
+          <option value="dia-despues">Día después</option>
         </select>
         <hr></hr>
         <label htmlFor="fecha-inicio">
           Fecha de inicio de la asignatura
         </label>
-        <input type="date" id="fecha-inicio" ></input>
+        <input type="date" id="fecha-inicio" name="fecha-inicio" ></input>
         <hr></hr>
         <label htmlFor="fecha-fin">
           Fecha de fin de la asignatura
         </label>
-        <input type="date" id="fecha-fin" ></input>
+        <input type="date" id="fecha-fin" name="fecha-fin" ></input>
         <hr></hr>
         <input type="reset" value="Reiniciar formulario"></input>
         <input type="submit" name="return" value="Guardar y crear una nueva asignatura"></input>
@@ -58,6 +59,20 @@ export default function FormOne() {
 export async function action( {request}: ActionFunctionArgs) {
   const formData = await request.formData();
   const intent = formData.get("return");
+  const existingSubjects = await getStoredSubjects();
+  //const subjectData = Object.fromEntries(formData);
+
+  const newFormData = new FormData();
+
+  for (const [key, value] of formData.entries()) {
+    if (key !== "return") {
+      newFormData.append(key, value);
+    }
+  }
+
+  newFormData.append("id", new Date().toISOString());
+  const updatedSubject = existingSubjects.concat(Object.fromEntries(newFormData));
+  storeSubjects(updatedSubject);
 
   if(intent === "Guardar y crear una nueva asignatura"){
     return redirect("/formTwo");
