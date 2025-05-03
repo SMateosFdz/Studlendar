@@ -22,7 +22,7 @@ export default function Index() {
       {data?.message && <p>{data.message}</p>}
 
       <h3>¿No tienes cuenta?</h3>
-      <button><Link to="/newAccount">Crea una nueva cuenta</Link></button>
+      <Link to="/newAccount">Crea una nueva cuenta</Link>
     </>
   );
 }
