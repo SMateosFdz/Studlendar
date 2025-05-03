@@ -1,5 +1,3 @@
-
-
 .grid-container {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
@@ -9,7 +7,55 @@
 }
 
 .grid-item {
-  border: 1px solid #ccc; /* Optional: for visibility */
-  background-color: #f0f0f0; /* Optional: background color */
+  border: 1px solid #ccc;
+  background-color: #f0f0f0;
   text-align: center;
+}
+
+.popup-show--true{
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.25);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup-show--false{
+  display: none;
+}
+
+
+.show--false {
+  display: none;
+}
+
+.show--true {
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: grey;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.show--true select {
+
+  margin: 10px;
+}
+
+.show--true label {
+  margin: 10px;
+}
+
+.show--true input {
+
+  margin: 10px;
+  width: 100px;
 }
