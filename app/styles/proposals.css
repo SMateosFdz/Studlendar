@@ -1,0 +1,47 @@
+.proposals-visible--true {
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: grey;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+    width: 300px;
+}
+
+.proposals-visible--false{
+    display: none;
+}
+
+.close{
+    float: right;
+}
+
+.close:hover{
+    cursor: pointer;
+}
+
+.proposals-button{
+    &.visible--false{
+        display: none;
+    }
+
+    &.visible--true{
+        display:block;
+        text-align: center;
+        margin: auto;
+        padding: 10px;
+        border: 1px solid blue;
+        background-color: white;
+        border-radius: 10px;
+    }
+
+    &.visible--true:hover{
+        cursor: pointer;
+        background-color: blue;
+        color: white;
+        border: 1px solid white;
+    }
+}

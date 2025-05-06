@@ -6,10 +6,15 @@
   margin: 20px;
 }
 
-.grid-item {
+.grid-item, .grid-block {
   border: 1px solid #ccc;
   background-color: #f0f0f0;
   text-align: center;
+}
+
+.grid-block:hover{
+  border: 1px solid black;
+  background-color: rgba(0, 0, 0, 0.25);
 }
 
 .popup-show--true{
@@ -29,9 +34,12 @@
   display: none;
 }
 
+.close{
+  float: right;
+}
 
-.show--false {
-  display: none;
+.close:hover{
+  cursor: pointer;
 }
 
 .show--true {
@@ -41,21 +49,32 @@
   top: 50%;
   transform: translate(-50%, -50%);
   background-color: grey;
+  width: 600px;
   padding: 10px;
   border-radius: 10px;
 }
 
-.show--true select {
+.block h2{
+  text-align: center;
+}
 
+.block select,
+.block input:not([type="submit"]){
+  float: right;
   margin: 10px;
 }
 
-.show--true label {
+.block label {
   margin: 10px;
 }
 
-.show--true input {
-
-  margin: 10px;
+.block input:not([type="submit"]) {
   width: 100px;
+}
+
+.block input[type="submit"]{
+  display: inline-block;
+  text-align: center;
+  margin: 20px;
+  width: auto;
 }
