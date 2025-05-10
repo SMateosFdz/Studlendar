@@ -1,16 +1,16 @@
 import type { ActionFunctionArgs} from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import { Form } from "@remix-run/react";
 import { getStoredSubjects, storeSubjects } from "~/data/subjects";
 
 import styles from "~/styles/formTwo.css";
 
 export default function FormOne() {
+
   return (
     <>
       <h1>Bienvenido a Studlendar</h1>
       <h2>Nueva asignatura</h2>
-      <Form method="post" id="sessionForm">
+      <form method="post" id="sessionForm">
         <label htmlFor="name">Nombre de la asignatura</label>
         <input type="text" id="name" name="name" ></input>
         <hr></hr>
@@ -48,10 +48,9 @@ export default function FormOne() {
         </label>
         <input type="date" id="fecha-fin" name="fecha-fin" ></input>
         <hr></hr>
-        <input type="reset" value="Reiniciar formulario"></input>
         <input type="submit" name="return" value="Guardar y crear una nueva asignatura"></input>
         <input type="submit" name="return" value="Guardar y volver al formulario"></input>
-      </Form>
+      </form>
     </>
   );
 }
@@ -60,7 +59,6 @@ export async function action( {request}: ActionFunctionArgs) {
   const formData = await request.formData();
   const intent = formData.get("return");
   const existingSubjects = await getStoredSubjects();
-  //const subjectData = Object.fromEntries(formData);
 
   const newFormData = new FormData();
 
