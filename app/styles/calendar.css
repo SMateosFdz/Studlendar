@@ -1,9 +1,24 @@
+body, html {
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 .grid-container {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
-  grid-template-rows: repeat(24, 1fr);
+  grid-template-rows: repeat(24, 50px);
   width: auto;
   margin: 20px;
+}
+
+.grid-item p{
+  display: inline-block;
+  line-height: 1;
+  vertical-align: middle;
 }
 
 .grid-item, .grid-block {

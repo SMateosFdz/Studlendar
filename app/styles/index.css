@@ -1,27 +1,49 @@
 :root{
-    background-color: rgb(220, 226, 253);
+    background-color:  #F9FBFD;
     text-align: center;
+    
 }
 
-h1{
-    text-align: center;
-    color: rgb(4, 0, 250);
+body{
+    overflow-y: hidden;
+}
+
+header{
+    animation: slideIn 3s;
+}
+
+main{
+    animation: slideIn 2.5s;
+}
+
+h1, h2, h3{
+    color: #466bad;
 }
 
 h2{
-    text-align: center;
+    margin: auto;
+    padding: 5px;
+    width: fit-content;
+    border: 1px blue solid;
+    border-radius: 10px;
+    box-shadow: 2px 5px;
+}
+
+img{
+    width: 150px;
+    margin: 20px;
+    border-radius: 10px;
 }
 
 #sessionForm{
     width: fit-content;
     border-radius: 10px;
-    background-color: rgb(114, 124, 255);
+    background-color: #466bad;
     margin: auto;
 }
 
 form{
     text-align: center;
-
 }
 
 form input{
@@ -36,7 +58,7 @@ form label{
 }
 
 button, a{
-    background-color: rgb(114, 124, 255);
+    background-color: #466bad;
     border: 1px solid black;
     color: white;
     border-radius: 10px;
@@ -56,4 +78,33 @@ button:hover, a:hover{
 
 a, a:hover{
     text-decoration: none;
+}
+
+.error {
+    margin: auto;
+    margin-top: 20px;
+    padding: 5px;
+    width: fit-content;
+    border: 1px solid red;
+    color: red;
+}
+
+footer{
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100px;
+    margin-bottom: 100px;
+    animation: slideIn 3s;
+}
+
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
