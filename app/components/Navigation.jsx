@@ -1,67 +1,87 @@
 import { NavLink } from "@remix-run/react";
 
-function Navigation({currentPage}) {
-    let content;
-  switch(currentPage){
+function Navigation({ currentPage }) {
+  let content;
+  switch (currentPage) {
     case "/":
-        content = <nav id="full-navigation">
-        <ul className="navigation">
-          <li className="nav-item">
-            <NavLink to={"/"} className={"link"}>
-              Empezar pomodoro
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink to={"/"} className={"link"}>
-              Modo estudio
-            </NavLink>
-          </li>
-
-          <h1 id="nav-title">Studlendar</h1>
-
-          <li className="nav-item">
-            <NavLink to={"/"} className={"link"}>
-              Apuntar horas de estudio
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink to={"/"} className={"link"}>
-              Configuración
-            </NavLink>
-          </li>
-        </ul>
-      </nav>;
-    break;
+      content = (
+        <header>
+          <h1 id="title">Studlendar</h1>
+          <nav id="full-navigation">
+            <ul className="navigation">
+              <li className="nav-item">
+                <NavLink to={"/pomodoro"} className={"link"}>
+                  Empezar pomodoro
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink to={"/"} className={"link"}>
+                  Modo estudio
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink to={"/"} className={"link"}>
+                  Apuntar horas de estudio
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink to={"/configuration"} className={"link"}>
+                  Configuración
+                </NavLink>
+              </li>
+            </ul>
+          </nav>
+        </header>
+      );
+      break;
 
     case "/proposals":
-        content = <nav id="full-navigation">
-        <ul className="navigation">
-          <li className="nav-item">
-            <NavLink to={"/"} className={"link"}>
-              Empezar pomodoro
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink to={"/"} className={"link"}>
-              Modo estudio
-            </NavLink>
-          </li>
+      content = (
+        <header>
+          <h1 id="title">Studlendar</h1>
+          <nav id="full-navigation">
+            <ul className="navigation">
+              <li className="nav-item">
+                <NavLink to={"/"} className={"link"}>
+                  Empezar pomodoro
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink to={"/"} className={"link"}>
+                  Modo estudio
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink to={"/"} className={"link"}>
+                  Apuntar horas de estudio
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink to={"/"} className={"link"}>
+                  Configuración
+                </NavLink>
+              </li>
+            </ul>
+          </nav>
+        </header>
+      );
+      break;
 
-          <h1 id="nav-title">Studlendar</h1>
-
-          <li className="nav-item">
-            <NavLink to={"/"} className={"link"}>
-              Apuntar horas de estudio
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink to={"/"} className={"link"}>
-              Configuración
-            </NavLink>
-          </li>
-        </ul>
-      </nav>;
-    break;
+    case "/pomodoro":
+      content = (
+        <header>
+          <h1 id="title">Studlendar</h1>
+          <nav id="full-navigation">
+          <ul className="navigation">
+            <li className="nav-item">
+              <NavLink to={"/main"} className={"link"}>
+                Volver al calendario
+              </NavLink>
+            </li>
+          </ul>
+        </nav>
+        </header>
+      );
   }
 
   return content;

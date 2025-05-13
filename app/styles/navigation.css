@@ -5,32 +5,40 @@
 }
 
 .navigation{
-    display: inline-block;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    list-style: none;
+    height: 60px;
     width: 100%;
 }
 
 .nav-item{
-    display: inline;
-    list-style-type: none;
-    margin: 20px;
+    flex: 1;
+    text-align: center;
 }
 
 .nav-item > .link{
-    color: black;
+    color: #466bad;
     text-decoration: none;
-    border: 2px solid blue;
+    margin: 20px;
+    color: #466bad;
+    border: 2px solid #466bad;
     padding: 5px;
     border-radius: 10px;
-}
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+} 
 
 .nav-item > .link:hover{
-    background-color: blue;
+    background-color: #466bad;
     color: white;
 }
 
-#nav-title{
-    display: inline;
+#title{
+    color: #466bad;
     text-align: center;
-    margin: 100px;
+    height: 20px;
 }
