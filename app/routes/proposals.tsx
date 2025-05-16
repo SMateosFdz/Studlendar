@@ -1,25 +1,92 @@
+/* eslint-disable array-callback-return */
 import Navigation from "~/components/Navigation";
 
 import navStyles from "~/styles/navigation.css";
 import calendarStyles from "~/styles/calendar.css";
 import proposalsStyles from "~/styles/proposals.css";
 import { getStoredSubjects } from "~/data/subjects";
-import { Form, json, useLoaderData } from "@remix-run/react";
+import { Form, redirect, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
+import type { ActionFunctionArgs } from "@remix-run/node";
+import { getStoredStudyBlocks, storeStudyBlocks } from "~/data/studyBlocks";
+
+export function showSubjectProposals(subject: any) {
+  const pool = Array.from({ length: 193 }, (_, i) => i);
+  const result = [];
+
+  for (let i = 0; i < subject.horas; i++) {
+    let random;
+    do {
+      random = Math.floor(Math.random() * pool.length);
+    } while (random % 8 === 0);
+    let chosen = pool.splice(random, 1)[0];
+    chosen = chosen + 24;
+    result.push(chosen);
+  }
+
+  const proposal: Proposal = {
+    id: subject.name,
+    proposals: result,
+  };
+
+  return proposal;
+}
 
 export async function loader() {
   const existingSubjects = await getStoredSubjects();
+  let selectedValues: Proposal[] = [];
+  existingSubjects.map((subject: any) => {
+    selectedValues.push(showSubjectProposals(subject));
+  });
 
-  return json(existingSubjects);
+  return selectedValues;
+}
+
+interface Proposal {
+  id: string;
+  proposals: number[];
+}
+
+interface StudyBlock {
+  id: string;
+  subjects: string;
+  time: string;
+  repetition: string;
 }
 
 export default function Proposals() {
-  const subjects: Subject[] = useLoaderData();
+  const selectedValues: Proposal[]  = useLoaderData();
+  const initialSubjects: { id: string; checked: boolean }[] = [];
+
+  const createInitialSubjects = () => {
+    let i = 0;
+    selectedValues.map((subject: { id: string, proposals: number[] }) => {
+      i = 0;
+      subject.proposals.map(() => {
+        initialSubjects.push({
+          id: subject.id + i,
+          checked: true,
+      });
+      i++;
+      })
+    });
+
+    return initialSubjects;
+  };
 
   const [isVisible, setIsVisible] = useState(true);
+  const [isChecked, setIsChecked] = useState(createInitialSubjects);
 
   const toggleVisibility = () => {
     setIsVisible((prev) => !prev);
+  };
+
+  const handleCheckboxChange = (id:  string) => {
+    setIsChecked((prevItems) =>(
+      prevItems.map((item) =>
+        item.id === id ? { ...item, checked: !item.checked } : item
+      )
+    ));
   };
 
   const daysOfWeek = [
@@ -36,9 +103,7 @@ export default function Proposals() {
 
   return (
     <>
-      <header>
-        <Navigation currentPage={"/proposals"} />
-      </header>
+      <Navigation currentPage={"/proposals"} />
       <main>
         <button
           className={`proposals-button visible--${!isVisible}`}
@@ -59,7 +124,22 @@ export default function Proposals() {
                 {numbers[index / 8]}:00
               </div>
             ) : (
-              <div className="grid-block" key={index + 24}></div>
+              <div className="grid-block" key={index + 24}>
+                {selectedValues.map((value: any) =>
+                  value.proposals.map((proposal: number, ind: number) =>
+                    proposal === index + 24 ? (
+                      isChecked.map((obj) => 
+                        obj.id == value.id + ind ? (
+                        obj.checked === true ? <p>{value.id}</p> : ""
+                      ) : (
+                        ""
+                      ))
+                    ) : (
+                      ""
+                    )
+                  )
+                )}
+              </div>
             )
           )}
         </div>
@@ -68,15 +148,28 @@ export default function Proposals() {
             &times;
           </span>
           <h2>Listado de propuestas</h2>
-          <Form>
-            {subjects.map((subject) => (
-              <>
-                <label>{subject.name}</label>
-                <input id={subject.id} type="checkbox"></input>
-                <br></br>
-              </>
-            ))}
-            <input type="submit" value="Guardar y cerrar" onClick={toggleVisibility}></input>
+          <Form method="post">
+            {selectedValues.map(
+              (subject: { id: string; proposals: number[] }, index: number) => (
+                <>
+                  <label htmlFor={subject.id}>{subject.id}</label>
+                  {
+                  subject.proposals.map((element, index) => (
+                    // eslint-disable-next-line react/jsx-key
+                    <input
+                      id={subject.id + index}
+                      type="checkbox"
+                      value={element}
+                      name={subject.id + index}
+                      checked={isChecked.find(obj => obj.id === subject.id + index)?.checked}
+                      onChange={() => handleCheckboxChange(subject.id + index)}
+                    ></input>
+                  ))}
+                  <br></br>
+                </>
+              )
+            )}
+            <input type="submit" name="close" value="Guardar y cerrar"></input>
           </Form>
         </div>
       </main>
@@ -84,7 +177,28 @@ export default function Proposals() {
   );
 }
 
+export async function action({ request }: ActionFunctionArgs) {
+  const formData = await request.formData();
 
+  let elements: StudyBlock[] = [];
+
+  formData.forEach((element, key) => {
+    if(key.split(/(\d+)/)[0] !== "close"){
+      elements.push({
+      id: element.toString(),
+      subjects: key.split(/(\d+)/)[0],
+      time: "1",
+      repetition: "semanal",
+      });
+    }
+  });
+  
+  const existingStudyBlocks = await getStoredStudyBlocks();
+  const updatedStudyBlocks = existingStudyBlocks.concat(elements);
+  storeStudyBlocks(updatedStudyBlocks);
+
+  return redirect("/main");
+}
 
 export function links() {
   return [
@@ -93,10 +207,3 @@ export function links() {
     { rel: "stylesheet", href: proposalsStyles },
   ];
 }
-
-type Subject = {
-  id: string;
-  name: string;
-  horas: string;
-  sesiones: string;
-};
