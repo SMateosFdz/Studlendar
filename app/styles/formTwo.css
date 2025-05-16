@@ -15,13 +15,13 @@ h2{
 #sessionForm{
     width: 50%;
     border-radius: 10px;
-    background-color: rgb(114, 124, 255);
+    background-color: #466bad;
     margin: auto;
     padding: 15px;
 }
 
-form input[type="reset"], form input[type="submit"]{
-    background-color: rgb(114, 124, 255);
+#sessionForm input[type="reset"], #sessionForm input[type="submit"]{
+    background-color: #466bad;
     color: white;
     border: 1px solid white;
     padding: 5px;
@@ -29,36 +29,36 @@ form input[type="reset"], form input[type="submit"]{
     border-radius: 10px;
 }
 
-form input[type="reset"]:hover, form input[type="submit"]:hover{
+#sessionForm input[type="reset"]:hover, #sessionForm input[type="submit"]:hover{
     background-color: white;
-    color: rgb(114, 124, 255);
-    border: 1px solid rgb(114, 124, 255);
+    color: #466bad;
+    border: 1px solid #466bad;
     padding: 5px;
     margin: 10px;
     border-radius: 10px;
 }
 
-form input:not([type="reset"], [type="submit"], [type="radio"]), form select{
+#sessionForm input:not([type="reset"], [type="submit"], [type="radio"]), #sessionForm select{
     float: right;
     margin: 20px;
     width: 200px;
 }
 
-form label{
+#sessionForm label{
     display: inline;
     color: white;
     float: left;
     margin: 20px;
 }
 
-fieldset{
+#sessionForm fieldset{
     margin: auto;
     text-align: right;
     border: 0 none;
     margin: 20px;
 }
 
-fieldset label{
+#sessionForm fieldset label{
     float: none;
 }
 

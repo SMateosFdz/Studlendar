@@ -15,26 +15,23 @@ h2{
 #sessionForm{
     width: 50%;
     border-radius: 10px;
-    background-color: rgb(114, 124, 255);
+    background-color: #466bad;
     margin: auto;
     padding: 15px;
-}
-
-form{
     text-align: center;
 }
 
-form input{
+#sessionForm input{
     margin: 10px;
     border-radius: 10px;
 }
 
-form input[type="radio"]{
+#sessionForm input[type="radio"]{
     display: inline;
 }
 
-form input[type="reset"], form input[type="submit"]{
-    background-color: rgb(114, 124, 255);
+#sessionForm input[type="reset"], #sessionForm input[type="submit"]{
+    background-color: #466bad;
     color: white;
     border: 1px solid white;
     padding: 5px;
@@ -42,19 +39,19 @@ form input[type="reset"], form input[type="submit"]{
     border-radius: 10px;
 }
 
-form input[type="reset"]:hover, form input[type="submit"]:hover{
+#sessionForm input[type="reset"]:hover, #sessionForm input[type="submit"]:hover{
     background-color: white;
-    color: rgb(114, 124, 255);
-    border: 1px solid rgb(114, 124, 255);
+    color: #466bad;
+    border: 1px solid #466bad;
     padding: 5px;
     margin: 10px;
     border-radius: 10px;
 }
 
-form input[type="reset"]:disabled, form input[type="submit"]:disabled{
+#sessionForm input[type="reset"]:disabled, #sessionForm input[type="submit"]:disabled{
     background-color: grey;
     color: white;
-    border: 1px solid rgb(114, 124, 255);
+    border: 1px solid #466bad;
     padding: 5px;
     margin: 10px;
     border-radius: 10px;
@@ -79,6 +76,11 @@ a{
     border-radius: 10px;
 }
 
+a:hover{
+    color: #466bad;
+    background-color: white;
+}
+
 fieldset{
     margin: auto;
     text-align: right;
@@ -86,7 +88,7 @@ fieldset{
     margin: 20px;
 }
 
-form button{
+#sessionForm button{
     float: right;
     margin: 20px;
 }
