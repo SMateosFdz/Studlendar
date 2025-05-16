@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 import Navigation from "~/components/Navigation";
 
 import navStyles from "~/styles/navigation.css";
@@ -39,7 +40,7 @@ export default function Main() {
     setCurrentSelection(selectedValues[blockId] || subjects[0].name);
   }
   // When form selection changes, update currentSelection state
-  function handleSelectionChange(e) {
+  function handleSelectionChange(e: any) {
     setCurrentSelection(e.target.value);
   }
   // When form is submitted, update the stored block value and close form
@@ -53,6 +54,22 @@ export default function Main() {
   // When form cancel is clicked
   function handleCancel() {
     setEditingBlock(false);
+  }
+
+  function handleTitle(id: number){
+    let flag = false;
+    let subject = "";
+    if(studyBlocks.length == 0){
+      return <h2>{"Nuevo bloque de estudio - " +  currentSelection}</h2>;
+    }else{
+      studyBlocks.map((studyBlock: { id: number; subjects: string; }) => {
+        if(studyBlock.id == id){
+          flag = true
+          subject = studyBlock.subjects;
+        }
+      })
+    }
+    return flag === false ? <h2>{"Nuevo bloque de estudio - " +  currentSelection}</h2> : <h2>{"Bloque de estudio - " + subject}</h2>;
   }
 
   const daysOfWeek = [
@@ -104,8 +121,8 @@ export default function Main() {
             <span className="close" id="closePopup" onClick={handleCancel}>
               &times;
             </span>
-            <h2>Nuevo bloque de estudio</h2>
-            <Form method="post" /* onSubmit={handleFormSubmit} */>
+            {handleTitle(editingId)}
+            <Form method="post">
               <input type="hidden" name="id" value={editingId}/>
               <label htmlFor="subjects">Asignatura:</label>
               <select
@@ -125,9 +142,9 @@ export default function Main() {
               <input type="number" name="time" id="time" min={1} defaultValue={1}></input>
               <br></br>
               <select name="repetition" id="repetition">
-                <option value="rep1">No se repite</option>
-                <option value="rep2">Se repite cada día</option>
-                <option value="rep3">Se repite cada semana</option>
+                <option value="no-rep">No se repite</option>
+                <option value="diario">Se repite cada día</option>
+                <option value="semanal">Se repite cada semana</option>
               </select>
               <input
                 type="submit"
@@ -145,11 +162,18 @@ export default function Main() {
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
+  const id = formData.get("id");
+  const existingStudyBlocks = await getStoredStudyBlocks();
 
-  const existingUsers = await getStoredStudyBlocks();
+  existingStudyBlocks.map((block: any, index: number) => {
+    if(block.id == id){
+      existingStudyBlocks.splice(index, 1);
+    }
+  });
+  
   const userData = Object.fromEntries(formData);
 
-  const updatedStudyBlocks = existingUsers.concat(userData);
+  const updatedStudyBlocks = existingStudyBlocks.concat(userData);
   storeStudyBlocks(updatedStudyBlocks);
 
   return null;
