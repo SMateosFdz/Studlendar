@@ -1,0 +1,59 @@
+#pomodoro{
+    background-color: #466bad;
+    border: 1px solid #466bad;
+    text-align: center;
+    width: fit-content;
+    margin: auto;
+    border-radius: 10px;
+    padding: 20px;
+    animation: slideIn 2s;
+}
+
+#pomodoro h1{
+    color: white;
+}
+
+#pomodoro label{
+    margin-right: 10px;
+    color: white;
+}
+
+.session-type{
+    color: white;
+    margin-top: 10px;
+}
+
+.timer-display{
+    background-color: #466bad;
+    color: white;
+    width: fit-content;
+    margin: auto;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.buttons button{
+    color: white;
+    background-color: #466bad;
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 5px;
+    margin: 20px;
+}
+
+.buttons button:hover{
+    background-color: white;
+    color: #466bad;
+    cursor: pointer;
+}
+
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

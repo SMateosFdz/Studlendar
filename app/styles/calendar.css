@@ -3,19 +3,18 @@ body, html {
   padding: 0;
 }
 
-* {
-  box-sizing: border-box;
-}
-
 .grid-container {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
-  grid-template-rows: repeat(24, 50px);
+  grid-template-rows: repeat(24, 1fr);
   width: auto;
+  height: auto;
   margin: 20px;
+  padding-bottom: 30px;
+  animation: appear 2.5s;
 }
 
-.grid-item p{
+.grid-item{
   display: inline-block;
   line-height: 1;
   vertical-align: middle;
@@ -23,13 +22,19 @@ body, html {
 
 .grid-item, .grid-block {
   border: 1px solid #ccc;
-  background-color: #f0f0f0;
+  background-color: #466bad;
+  color: white;
   text-align: center;
 }
 
+.grid-item::after, .grid-block::after{
+  margin-bottom: 20px;
+}
+
 .grid-block:hover{
-  border: 1px solid black;
-  background-color: rgba(0, 0, 0, 0.25);
+  border: 1px solid #466bad;
+  color: #466bad;
+  background-color: white;
 }
 
 .popup-show--true{
@@ -43,6 +48,7 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
+  animation: appear 1s;
 }
 
 .popup-show--false{
@@ -57,19 +63,14 @@ body, html {
   cursor: pointer;
 }
 
-.show--true {
-  display: block;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  background-color: grey;
+.show--true{
+  background-color: rgb(220, 226, 253);
   width: 600px;
   padding: 10px;
   border-radius: 10px;
 }
 
-.block h2{
+.popup__title{
   text-align: center;
 }
 
@@ -88,8 +89,16 @@ body, html {
 }
 
 .block input[type="submit"]{
-  display: inline-block;
   text-align: center;
-  margin: 20px;
-  width: auto;
+  margin: auto;
+  float: right;
+}
+
+@keyframes appear {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }

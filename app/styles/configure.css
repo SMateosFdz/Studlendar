@@ -1,0 +1,97 @@
+:root{
+    background-color: rgb(220, 226, 253);
+    text-align: center;
+}
+
+h1{
+    text-align: center;
+    color: rgb(4, 0, 250);
+}
+
+h2{
+    text-align: center;
+}
+
+#sessionForm{
+    width: 50%;
+    border-radius: 10px;
+    background-color: #466bad;
+    margin: auto;
+    padding: 15px;
+    text-align: center;
+}
+
+#sessionForm input{
+    margin: 10px;
+    border-radius: 10px;
+}
+
+#sessionForm input[type="radio"]{
+    display: inline;
+}
+
+#sessionForm input[type="reset"], #sessionForm input[type="submit"]{
+    background-color: #466bad;
+    color: white;
+    border: 1px solid white;
+    padding: 5px;
+    margin: 10px;
+    border-radius: 10px;
+}
+
+#sessionForm input[type="reset"]:hover, #sessionForm input[type="submit"]:hover{
+    background-color: white;
+    color: #466bad;
+    border: 1px solid #466bad;
+    padding: 5px;
+    margin: 10px;
+    border-radius: 10px;
+}
+
+#sessionForm input[type="reset"]:disabled, #sessionForm input[type="submit"]:disabled{
+    background-color: grey;
+    color: white;
+    border: 1px solid #466bad;
+    padding: 5px;
+    margin: 10px;
+    border-radius: 10px;
+    cursor: not-allowed;
+}
+
+label{
+    display: inline;
+    color: white;
+    float: left;
+    margin: 20px;
+}
+
+#sessionForm a{
+    margin: 30px;
+    text-decoration: none;
+    text-align: center;
+    color: white;
+    padding: 2px 5px;
+    border: 1px solid white;
+    border-radius: 10px;
+}
+
+#sessionForm a:hover{
+    color: #466bad;
+    background-color: white;
+}
+
+fieldset{
+    margin: auto;
+    text-align: right;
+    border: 0 none;
+    margin: 20px;
+}
+
+#sessionForm button{
+    float: right;
+    margin: 20px;
+}
+
+hr{
+    clear: both;
+}
