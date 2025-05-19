@@ -1,47 +1,63 @@
+#title {
+  text-align: center;
+  color: blue;
+  margin-bottom: 20px;
+}
+
+.popup-visible--true {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
 .proposals-visible--true {
-    display: block;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    background-color: grey;
-    padding: 10px;
-    border-radius: 10px;
-    text-align: center;
-    width: 300px;
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: grey;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
+  width: 300px;
 }
 
-.proposals-visible--false{
+.proposals-visible--false {
+  display: none;
+}
+
+.close {
+  float: right;
+}
+
+.close:hover {
+  cursor: pointer;
+}
+
+.proposals-button {
+  &.visible--false {
     display: none;
-}
+  }
 
-.close{
-    float: right;
-}
+  &.visible--true {
+    display: block;
+    text-align: center;
+    margin: auto;
+    padding: 10px;
+    border: 1px solid blue;
+    background-color: white;
+    border-radius: 10px;
+  }
 
-.close:hover{
+  &.visible--true:hover {
     cursor: pointer;
-}
-
-.proposals-button{
-    &.visible--false{
-        display: none;
-    }
-
-    &.visible--true{
-        display:block;
-        text-align: center;
-        margin: auto;
-        padding: 10px;
-        border: 1px solid blue;
-        background-color: white;
-        border-radius: 10px;
-    }
-
-    &.visible--true:hover{
-        cursor: pointer;
-        background-color: blue;
-        color: white;
-        border: 1px solid white;
-    }
+    background-color: blue;
+    color: white;
+    border: 1px solid white;
+  }
 }

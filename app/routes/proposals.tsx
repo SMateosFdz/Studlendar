@@ -1,7 +1,4 @@
 /* eslint-disable array-callback-return */
-import Navigation from "~/components/Navigation";
-
-import navStyles from "~/styles/navigation.css";
 import calendarStyles from "~/styles/calendar.css";
 import proposalsStyles from "~/styles/proposals.css";
 import { getStoredSubjects } from "~/data/subjects";
@@ -55,20 +52,20 @@ interface StudyBlock {
 }
 
 export default function Proposals() {
-  const selectedValues: Proposal[]  = useLoaderData();
+  const selectedValues: Proposal[] = useLoaderData();
   const initialSubjects: { id: string; checked: boolean }[] = [];
 
   const createInitialSubjects = () => {
     let i = 0;
-    selectedValues.map((subject: { id: string, proposals: number[] }) => {
+    selectedValues.map((subject: { id: string; proposals: number[] }) => {
       i = 0;
       subject.proposals.map(() => {
         initialSubjects.push({
           id: subject.id + i,
           checked: true,
+        });
+        i++;
       });
-      i++;
-      })
     });
 
     return initialSubjects;
@@ -81,12 +78,12 @@ export default function Proposals() {
     setIsVisible((prev) => !prev);
   };
 
-  const handleCheckboxChange = (id:  string) => {
-    setIsChecked((prevItems) =>(
+  const handleCheckboxChange = (id: string) => {
+    setIsChecked((prevItems) =>
       prevItems.map((item) =>
         item.id === id ? { ...item, checked: !item.checked } : item
       )
-    ));
+    );
   };
 
   const daysOfWeek = [
@@ -103,7 +100,9 @@ export default function Proposals() {
 
   return (
     <>
-      <Navigation currentPage={"/proposals"} />
+      <header>
+        <h1 id="title">Studlendar</h1>
+      </header>
       <main>
         <button
           className={`proposals-button visible--${!isVisible}`}
@@ -127,50 +126,67 @@ export default function Proposals() {
               <div className="grid-block" key={index + 24}>
                 {selectedValues.map((value: any) =>
                   value.proposals.map((proposal: number, ind: number) =>
-                    proposal === index + 24 ? (
-                      isChecked.map((obj) => 
-                        obj.id == value.id + ind ? (
-                        obj.checked === true ? <p>{value.id}</p> : ""
-                      ) : (
-                        ""
-                      ))
-                    ) : (
-                      ""
-                    )
+                    proposal === index + 24
+                      ? isChecked.map((obj) =>
+                          obj.id == value.id + ind ? (
+                            obj.checked === true ? (
+                              <p>{value.id}</p>
+                            ) : (
+                              ""
+                            )
+                          ) : (
+                            ""
+                          )
+                        )
+                      : ""
                   )
                 )}
               </div>
             )
           )}
         </div>
-        <div className={`proposals-visible--${isVisible}`}>
-          <span className="close" id="closePopup" onClick={toggleVisibility}>
-            &times;
-          </span>
-          <h2>Listado de propuestas</h2>
-          <Form method="post">
-            {selectedValues.map(
-              (subject: { id: string; proposals: number[] }, index: number) => (
-                <>
-                  <label htmlFor={subject.id}>{subject.id}</label>
-                  {
-                  subject.proposals.map((element, index) => (
-                    // eslint-disable-next-line react/jsx-key
-                    <input
-                      id={subject.id + index}
-                      type="checkbox"
-                      value={element}
-                      name={subject.id + index}
-                      checked={isChecked.find(obj => obj.id === subject.id + index)?.checked}
-                      onChange={() => handleCheckboxChange(subject.id + index)}
-                    ></input>
-                  ))}
-                  <br></br>
-                </>
-              )
-            )}
-            <input type="submit" name="close" value="Guardar y cerrar"></input>
-          </Form>
+
+        <div className={`popup-visible--${isVisible}`}>
+          <div className={`proposals-visible--${isVisible}`}>
+            <span className="close" id="closePopup" onClick={toggleVisibility}>
+              &times;
+            </span>
+            <h2>Listado de propuestas</h2>
+            <Form method="post">
+              {selectedValues.map(
+                (
+                  subject: { id: string; proposals: number[] },
+                  index: number
+                ) => (
+                  <>
+                    <label htmlFor={subject.id}>{subject.id}</label>
+                    {subject.proposals.map((element, index) => (
+                      // eslint-disable-next-line react/jsx-key
+                      <input
+                        id={subject.id + index}
+                        type="checkbox"
+                        value={element}
+                        name={subject.id + index}
+                        checked={
+                          isChecked.find((obj) => obj.id === subject.id + index)
+                            ?.checked
+                        }
+                        onChange={() =>
+                          handleCheckboxChange(subject.id + index)
+                        }
+                      ></input>
+                    ))}
+                    <br></br>
+                  </>
+                )
+              )}
+              <input
+                type="submit"
+                name="close"
+                value="Guardar y cerrar"
+              ></input>
+            </Form>
+          </div>
         </div>
       </main>
     </>
@@ -183,16 +199,16 @@ export async function action({ request }: ActionFunctionArgs) {
   let elements: StudyBlock[] = [];
 
   formData.forEach((element, key) => {
-    if(key.split(/(\d+)/)[0] !== "close"){
+    if (key.split(/(\d+)/)[0] !== "close") {
       elements.push({
-      id: element.toString(),
-      subjects: key.split(/(\d+)/)[0],
-      time: "1",
-      repetition: "semanal",
+        id: element.toString(),
+        subjects: key.split(/(\d+)/)[0],
+        time: "1",
+        repetition: "semanal",
       });
     }
   });
-  
+
   const existingStudyBlocks = await getStoredStudyBlocks();
   const updatedStudyBlocks = existingStudyBlocks.concat(elements);
   storeStudyBlocks(updatedStudyBlocks);
@@ -202,7 +218,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export function links() {
   return [
-    { rel: "stylesheet", href: navStyles },
     { rel: "stylesheet", href: calendarStyles },
     { rel: "stylesheet", href: proposalsStyles },
   ];
