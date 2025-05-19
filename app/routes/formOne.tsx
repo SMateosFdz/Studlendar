@@ -1,8 +1,6 @@
-import type { ActionFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Form, Link, redirect, useLoaderData } from "@remix-run/react";
-import React from "react";
 import { getStoredSubjects } from "~/data/subjects";
-
 import styles from "~/styles/formOne.css";
 
 export async function loader(){
@@ -10,6 +8,12 @@ export async function loader(){
 
   return existingSubjects.length;
 }
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Studlendar" },
+  ];
+};
 
 export default function FormOne() {
   const number = useLoaderData();
@@ -19,13 +23,8 @@ export default function FormOne() {
       <h1>Bienvenido a Studlendar</h1>
       <h2>Formulario inicial</h2>
       <div id="sessionForm">
-        <label htmlFor="nueva-asignatura">Crear una nueva asignatura:</label>
-        <Link to="/formTwo">
-          +
-        </Link>
-        <hr></hr>
         <Form method="post">
-          <label htmlFor="momento">¿En qué momento del día eres más productivo?</label>
+          <label htmlFor="momento" id="momento">¿En qué momento del día eres más productivo?</label>
           <fieldset id="momento">
             <input type="checkbox" id="mañana"></input>
             <label htmlFor="mañana">Mañana</label>
@@ -55,7 +54,6 @@ export default function FormOne() {
             <label>No</label>
           </fieldset>
           <hr></hr>
-          <input type="reset" value="Reiniciar formulario"></input>
           <input
             type="submit"
             name="move"
@@ -76,12 +74,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (intent === "Guardar e ir al siguiente paso") {
     if (number !== 0) {
-      return redirect("/formFour");
-    } else {
-      console.log(
-        "No se puede avanzar sin haber creado al menos una asignatura. Actualmente: " + number
-      );
-      return redirect("/formOne");
+      return redirect("/configurationForm");
     }
   }
 

@@ -2,9 +2,9 @@ import type { ActionFunctionArgs} from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form  } from "@remix-run/react";
 
-import styles from "~/styles/formTwo.css";
+import styles from "~/styles/formOne.css";
 
-export default function FormOne() {
+export default function Notifications() {
   return (
     <>
       <h1>Bienvenido a Studlendar</h1>
@@ -70,8 +70,7 @@ export default function FormOne() {
           <label>No</label>
         </fieldset>
         <hr></hr>
-        <input type="reset" value="Reiniciar formulario"></input>
-        <input type="submit" name="move" value="Guardar e ir al siguiente paso"></input>
+        <input type="submit" name="move" value="Guardar y volver"></input>
       </Form>
     </>
   );
@@ -81,8 +80,8 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const intent = formData.get("move");
 
-  if (intent === "Guardar e ir al siguiente paso") {
-    return redirect("/proposals");
+  if (intent === "Guardar y volver") {
+    return redirect("/configurationForm");
   }
 
   throw new Error("Acción desconocida");

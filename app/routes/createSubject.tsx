@@ -1,10 +1,16 @@
-import type { ActionFunctionArgs} from "@remix-run/node";
+import type { ActionFunctionArgs, MetaFunction} from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { getStoredSubjects, storeSubjects } from "~/data/subjects";
 
-import styles from "~/styles/formTwo.css";
+import styles from "~/styles/createSubject.css";
 
-export default function FormOne() {
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Studlendar" },
+  ];
+};
+
+export default function CreateSubject() {
 
   return (
     <>
@@ -49,7 +55,7 @@ export default function FormOne() {
         <input type="date" id="fecha-fin" name="fecha-fin" ></input>
         <hr></hr>
         <input type="submit" name="return" value="Guardar y crear una nueva asignatura"></input>
-        <input type="submit" name="return" value="Guardar y volver al formulario"></input>
+        <input type="submit" name="return" value="Guardar y volver"></input>
       </form>
     </>
   );
@@ -73,11 +79,11 @@ export async function action( {request}: ActionFunctionArgs) {
   storeSubjects(updatedSubject);
 
   if(intent === "Guardar y crear una nueva asignatura"){
-    return redirect("/formTwo");
+    return redirect("/createSubject");
   }
 
-  if(intent === "Guardar y volver al formulario"){
-    return redirect("/formOne");
+  if(intent === "Guardar y volver"){
+    return redirect("/configurationForm");
   }
 
   throw new Error("Acción desconocida");
