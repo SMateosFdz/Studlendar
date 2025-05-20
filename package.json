@@ -3,12 +3,13 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "build": "remix build",
-    "dev": "remix dev",
+    "build": "npx prisma db && npx prisma generate && remix build",
+    "dev": "npx prisma db && npx prisma generate && remix dev",
     "start": "remix-serve build",
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@prisma/client": "^6.8.2",
     "@remix-run/node": "^2.0.0-pre.8",
     "@remix-run/react": "^2.0.0-pre.8",
     "@remix-run/serve": "^2.0.0-pre.8",
@@ -25,6 +26,7 @@
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "eslint": "^8.38.0",
+    "prisma": "^6.8.2",
     "typescript": "^5.1.6"
   },
   "engines": {
