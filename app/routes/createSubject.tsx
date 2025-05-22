@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs, MetaFunction} from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import { getStoredSubjects, storeSubjects } from "~/data/subjects";
-
+import { Link, useActionData } from "@remix-run/react";
+import { addSubject } from "~/data/subjects.server";
 import styles from "~/styles/createSubject.css";
 
 export const meta: MetaFunction = () => {
@@ -11,52 +11,55 @@ export const meta: MetaFunction = () => {
 };
 
 export default function CreateSubject() {
-
+  const data: any = useActionData();
+  
   return (
     <>
       <h1>Bienvenido a Studlendar</h1>
       <h2>Nueva asignatura</h2>
       <form method="post" id="sessionForm">
         <label htmlFor="name">Nombre de la asignatura</label>
-        <input type="text" id="name" name="name" ></input>
+        <input type="text" id="name" name="name" required></input>
         <hr></hr>
         <label htmlFor="horas">
           ¿Cuántas horas a la semana quieres enfocarte en el estudio?
         </label>
-        <input type="number" id="horas" name="horas" min={1} ></input>
+        <input type="number" id="horas" name="horas" min={1} required></input>
         <hr></hr>
-        <label htmlFor="sesiones">Tamaño de las sesiones de estudio</label>
-        <fieldset id="sesiones" name="sesiones">
-          <input type="radio" value="1" name="sesiones"></input>
+        <label htmlFor="sessions">Tamaño de las sesiones de estudio</label>
+        <fieldset id="sessions" name="sessions">
+          <input type="radio" value="1" name="sessions" required></input>
           <label>1h</label>
-          <input type="radio" value="2" name="sesiones"></input>
+          <input type="radio" value="2" name="sessions"></input>
           <label>2h</label>
-          <input type="radio" value="3" name="sesiones"></input>
+          <input type="radio" value="3" name="sessions"></input>
           <label>3h</label>
-          <input type="radio" value="otro" name="sesiones"></input>
+          <input type="radio" value="otro" name="sessions"></input>
           <label>Otro</label>
         </fieldset>
         <hr></hr>
-        <label htmlFor="org-sesiones">Organización de las sesiones de estudio</label>
-        <select name="org-sesiones" id="org-sesiones">
+        <label htmlFor="sessionOrg">Organización de las sesiones de estudio</label>
+        <select name="sessionOrg" id="sessionOrg" required>
           <option value="por-dia">Por día</option>
           <option value="dia-antes">Día antes</option>
           <option value="dia-despues">Día después</option>
         </select>
         <hr></hr>
-        <label htmlFor="fecha-inicio">
+        <label htmlFor="initialDate">
           Fecha de inicio de la asignatura
         </label>
-        <input type="date" id="fecha-inicio" name="fecha-inicio" ></input>
+        <input type="date" id="initialDate" name="initialDate" required></input>
         <hr></hr>
-        <label htmlFor="fecha-fin">
+        <label htmlFor="endDate">
           Fecha de fin de la asignatura
         </label>
-        <input type="date" id="fecha-fin" name="fecha-fin" ></input>
+        <input type="date" id="endDate" name="endDate" required></input>
         <hr></hr>
         <input type="submit" name="return" value="Guardar y crear una nueva asignatura"></input>
         <input type="submit" name="return" value="Guardar y volver"></input>
       </form>
+      <Link to={"/configurationForm"}>Cancelar</Link>
+      {data?.message && <p>{data.message}</p>}
     </>
   );
 }
@@ -64,25 +67,34 @@ export default function CreateSubject() {
 export async function action( {request}: ActionFunctionArgs) {
   const formData = await request.formData();
   const intent = formData.get("return");
-  const existingSubjects = await getStoredSubjects();
+  const subjectData = Object.fromEntries(formData);
 
-  const newFormData = new FormData();
+  if (intent === "Cancelar") {
+    return redirect("/configurationForm");
+  }
 
-  for (const [key, value] of formData.entries()) {
-    if (key !== "return") {
-      newFormData.append(key, value);
+  const [year, month, day] = subjectData.initialDate.toString().split("-");
+  const [year2, month2, day2] = subjectData.endDate.toString().split("-");
+
+  if(year > year2){
+    return { message: "La año de fin debe ser mayor que la de inicio" };
+  } else{
+    if(month > month2){
+      return { message: "El mes de fin debe ser mayor que la de inicio" };
+    }else {
+      if(day >= day2){
+        return { message: "El día de fin debe ser mayor que la de inicio" };
+      }
     }
   }
 
-  newFormData.append("id", new Date().toISOString());
-  const updatedSubject = existingSubjects.concat(Object.fromEntries(newFormData));
-  storeSubjects(updatedSubject);
-
   if(intent === "Guardar y crear una nueva asignatura"){
+    addSubject(subjectData);
     return redirect("/createSubject");
   }
 
   if(intent === "Guardar y volver"){
+    addSubject(subjectData);
     return redirect("/configurationForm");
   }
 

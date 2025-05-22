@@ -18,3 +18,12 @@ model User {
   nameUser String @unique
   password String
 }
+
+model Subject {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  sessions String
+  sessionOrg String
+  initialDate DateTime
+  endDate DateTime
+}
