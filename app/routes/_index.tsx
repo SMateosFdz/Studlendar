@@ -1,9 +1,9 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
-import { getStoredUsers } from "~/data/users";
 import styles from "~/styles/index.css";
 import logo from "~/images/Studlendar.png";
+import { prisma } from "~/data/database.server";
 
 export default function Index() {
   const data: any = useActionData();
@@ -19,8 +19,8 @@ export default function Index() {
         <img src={logo} alt=""></img>
         <h3>Inicio de sesión</h3>
         <Form method="post" id="sessionForm">
-          <label htmlFor="name">Nombre:</label>
-          <input type="text" name="name" id="name" required></input>
+          <label htmlFor="nameUser">Nombre:</label>
+          <input type="text" name="nameUser" id="nameUser" required></input>
           <label htmlFor="password">Contraseña:</label>
           <input type="password" name="password" id="password" required></input>
           <button>Iniciar sesión</button>
@@ -40,11 +40,11 @@ export default function Index() {
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const existingUsers = await getStoredUsers();
+  const allUser = await prisma.user.findMany();
   const userData = Object.fromEntries(formData);
 
-  for (var nameComprobation of existingUsers) {
-    if (userData.name.toString() === nameComprobation.name) {
+  for (var nameComprobation of allUser) {
+    if (userData.nameUser.toString() === nameComprobation.nameUser) {
       if (userData.password.toString() !== nameComprobation.password) {
         return { message: "Contraseña incorrecta, prueba de nuevo" };
       } else{
