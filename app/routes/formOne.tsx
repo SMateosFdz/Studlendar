@@ -1,13 +1,7 @@
 import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
-import { Form, Link, redirect, useLoaderData } from "@remix-run/react";
+import { Form, redirect } from "@remix-run/react";
 import { getStoredSubjects } from "~/data/subjects";
 import styles from "~/styles/formOne.css";
-
-export async function loader(){
-  const existingSubjects = await getStoredSubjects();
-
-  return existingSubjects.length;
-}
 
 export const meta: MetaFunction = () => {
   return [
@@ -16,7 +10,6 @@ export const meta: MetaFunction = () => {
 };
 
 export default function FormOne() {
-  const number = useLoaderData();
 
   return (
     <>
@@ -58,7 +51,6 @@ export default function FormOne() {
             type="submit"
             name="move"
             value="Guardar e ir al siguiente paso"
-            disabled={number === 0}
           ></input>
         </Form>
       </div>
@@ -74,7 +66,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (intent === "Guardar e ir al siguiente paso") {
     if (number !== 0) {
-      return redirect("/configurationForm");
+      return redirect("/configurationForm/formOne");
     }
   }
 
