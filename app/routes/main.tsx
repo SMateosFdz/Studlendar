@@ -1,16 +1,40 @@
 /* eslint-disable array-callback-return */
 import navStyles from "~/styles/navigation.css";
 import calendarStyles from "~/styles/calendar.css";
-import { getStoredSubjects } from "~/data/subjects";
-import type { ActionFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { Form, NavLink, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
-import { getStoredStudyBlocks, storeStudyBlocks } from "~/data/studyBlocks";
+import { userId } from "~/cookies.server";
+import { prisma } from "~/data/database.server";
+import { addStudyBlock } from "~/data/studyBlocks.server";
 
-export async function loader() {
-  const existingSubjects = await getStoredSubjects();
-  const existingStudyBlocks = await getStoredStudyBlocks();
+interface StudyBlock {
+  blockId: string;
+  name: string;
+  subjectName: string;
+  time: string;
+  repetition: string;
+}
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const cookie = await userId.parse(request.headers.get("Cookie"));
+  const existingSubjects = await prisma.subject.findMany({
+    where: { authorId: cookie.userId },
+  });
+
+  const existingStudyBlocks = [];
+
+  const studyBlocks = existingSubjects.map(async (subject) => {
+    const studyBlocks = await prisma.studyBlock.findMany({
+      where: { subjectName: subject.name },
+    });
+    return studyBlocks;
+  });
+
+  const allStudyBlocks = await Promise.all(studyBlocks);
+
+  existingStudyBlocks.push(...allStudyBlocks.flat());
 
   const response = {
     subjects: existingSubjects,
@@ -23,21 +47,29 @@ export async function loader() {
 export default function Main() {
   const { subjects, studyBlocks } = useLoaderData();
 
-  // Store the values selected for each grid block (keyed by block id)
   const [selectedValues, setSelectedValues] = useState([]);
-  // Track which block is currently being edited (null if none)
   const [editingBlock, setEditingBlock] = useState(false);
+  const [typeBlock, setTypeBlock] = useState(false);
   const [recordHours, setRecordHours] = useState(false);
   const [subjectEvent, setSubjectEvent] = useState(false);
   const [editingId, setEditingId] = useState(0);
-  // The current selection in the form dropdown
   const [currentSelection, setCurrentSelection] = useState("");
-  // When a grid block is clicked, set it as editing block and load its current value
-  function handleBlockClick(blockId: any) {
+
+  function handleBlockClick(blockId: any, e: Event) {
+    e.stopPropagation();
     setEditingBlock(true);
     setEditingId(blockId);
+    setTypeBlock(true);
     setCurrentSelection(selectedValues[blockId] || subjects[0].name);
   }
+
+  function handleGridBlockClick(blockId: any) {
+    setEditingBlock(true);
+    setEditingId(blockId);
+    setTypeBlock(false);
+    setCurrentSelection(selectedValues[blockId] || subjects[0].name);
+  }
+
   // When form selection changes, update currentSelection state
   function handleSelectionChange(e: any) {
     setCurrentSelection(e.target.value);
@@ -64,30 +96,118 @@ export default function Main() {
     setSubjectEvent(!subjectEvent);
   }
 
-  function handleTitle(id: number) {
-    let flag = false;
+  function handlePopup(id: number) {
+    let form;
     let subject = "";
-    if (studyBlocks.length == 0) {
-      return (
-        <h2 className="popup__title">
-          {"Nuevo bloque de estudio - " + currentSelection}
-        </h2>
-      );
-    } else {
-      studyBlocks.map((studyBlock: { id: number; subjects: string }) => {
-        if (studyBlock.id == id) {
-          flag = true;
-          subject = studyBlock.subjects;
+    let name = "";
+    if (studyBlocks.length != 0) {
+      studyBlocks.map((studyBlock: { blockId: number; name: string; subjectName: string; }) => {
+        if (studyBlock.blockId == id) {
+          name = studyBlock.name;
+          subject = studyBlock.subjectName;
         }
       });
     }
-    return flag === false ? (
-      <h2 className="popup__title">
-        {"Nuevo bloque de estudio - " + currentSelection}
-      </h2>
-    ) : (
-      <h2 className="popup__title">{"Bloque de estudio - " + subject}</h2>
-    );
+    typeBlock === false
+      ? (form = (
+          <>
+            <h2 className="popup__title">
+              {"Nuevo bloque de estudio - " + currentSelection}
+            </h2>
+            <Form method="post">
+              <input type="hidden" name="id" value={editingId} />
+              <label htmlFor="name">Nombre del bloque:</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+              ></input>
+              <br></br>
+              <label htmlFor="subjectName">Asignatura:</label>
+              <select
+                name="subjectName"
+                id="subjectName"
+                value={currentSelection}
+                onChange={handleSelectionChange}
+              >
+                {subjects.map((subject: any) => (
+                  <option key={subject.name} value={subject.name}>
+                    {subject.name}
+                  </option>
+                ))}
+              </select>
+              <br></br>
+              <label htmlFor="time">Tiempo de estudio: </label>
+              <input
+                type="number"
+                name="time"
+                id="time"
+                min={1}
+                defaultValue={1}
+              ></input>
+              <br></br>
+              <select name="repetition" id="repetition">
+                <option value="no-rep">No se repite</option>
+                <option value="diario">Se repite cada día</option>
+                <option value="semanal">Se repite cada semana</option>
+              </select>
+              <br></br>
+              <input
+                type="submit"
+                name="return"
+                value="Guardar y volver"
+                onClick={handleFormSubmit}
+              ></input>
+            </Form>
+          </>
+        ))
+      : (form = (
+          <>
+            <h2 className="popup__title">{"Bloque de estudio - " + name}</h2>
+            <Form method="post">
+              <input type="hidden" name="id" value={editingId} />
+              <label htmlFor="name">Nombre del bloque:</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder={name}
+              ></input>
+              <br></br>
+              <label htmlFor="subjectName">Asignatura:</label>
+              <input
+                id="subjectName"
+                name="subjectName"
+                value={subject}
+                readOnly
+              ></input>
+              <br></br>
+              <label htmlFor="time">Tiempo de estudio: </label>
+              <input
+                type="number"
+                name="time"
+                id="time"
+                min={1}
+                defaultValue={1}
+              ></input>
+              <br></br>
+              <select name="repetition" id="repetition">
+                <option value="no-rep">No se repite</option>
+                <option value="diario">Se repite cada día</option>
+                <option value="semanal">Se repite cada semana</option>
+              </select>
+              <br></br>
+              <input
+                type="submit"
+                name="return"
+                value="Guardar y volver"
+                onClick={handleFormSubmit}
+              ></input>
+            </Form>
+          </>
+        ));
+
+    return form;
   }
 
   const daysOfWeek = [
@@ -128,7 +248,7 @@ export default function Main() {
               </button>
             </li>
             <li className="nav-item">
-              <NavLink to={"/configuration"} className={"link"}>
+              <NavLink to={"/configurationForm"} className={"link"}>
                 Configuración
               </NavLink>
             </li>
@@ -152,13 +272,18 @@ export default function Main() {
               <div
                 className="grid-block"
                 key={index + 24}
-                onClick={() => handleBlockClick(index + 24)}
+                onClick={() => handleGridBlockClick(index + 24)}
               >
                 {studyBlocks.map(
-                  (studyBlock: { id: number; subjects: string }) =>
+                  (studyBlock: { blockId: number; name: string }) =>
                     // eslint-disable-next-line react/jsx-key
-                    studyBlock.id == index + 24 ? (
-                      <p>{studyBlock.subjects}</p>
+                    studyBlock.blockId == index + 24 ? (
+                      <div
+                        className="block"
+                        onClick={(e) => handleBlockClick(index + 24, e)}
+                      >
+                        {studyBlock.name}
+                      </div>
                     ) : (
                       selectedValues[index + 24]
                     )
@@ -173,45 +298,7 @@ export default function Main() {
             <span className="close" id="closePopup" onClick={handleCancel}>
               &times;
             </span>
-            {handleTitle(editingId)}
-            <Form method="post">
-              <input type="hidden" name="id" value={editingId} />
-              <label htmlFor="subjects">Asignatura:</label>
-              <select
-                name="subjects"
-                id="subjects"
-                value={currentSelection}
-                onChange={handleSelectionChange}
-              >
-                {subjects.map((subject: any) => (
-                  <option key={subject.name} value={subject.name}>
-                    {subject.name}
-                  </option>
-                ))}
-              </select>
-              <br></br>
-              <label htmlFor="time">Tiempo de estudio: </label>
-              <input
-                type="number"
-                name="time"
-                id="time"
-                min={1}
-                defaultValue={1}
-              ></input>
-              <br></br>
-              <select name="repetition" id="repetition">
-                <option value="no-rep">No se repite</option>
-                <option value="diario">Se repite cada día</option>
-                <option value="semanal">Se repite cada semana</option>
-              </select>
-              <br></br>
-              <input
-                type="submit"
-                name="return"
-                value="Guardar y volver"
-                onClick={handleFormSubmit}
-              ></input>
-            </Form>
+            {handlePopup(editingId)}
           </div>
         </div>
 
@@ -277,14 +364,10 @@ export default function Main() {
                 ))}
               </select>
               <hr></hr>
-              <label htmlFor="color">
-                Color asociado: 
-              </label>
+              <label htmlFor="color">Color asociado:</label>
               <input id="color" type="color"></input>
               <hr></hr>
-              <label htmlFor="fecha">
-                Fecha del evento: 
-              </label>
+              <label htmlFor="fecha">Fecha del evento:</label>
               <input type="date" id="fecha" name="fecha"></input>
               <hr></hr>
               <label htmlFor="notas">Notas: </label>
@@ -306,21 +389,24 @@ export default function Main() {
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const id = formData.get("id");
-  const existingStudyBlocks = await getStoredStudyBlocks();
 
-  existingStudyBlocks.map((block: any, index: number) => {
-    if (block.id == id) {
-      existingStudyBlocks.splice(index, 1);
-    }
-  });
+  let studyBlock: StudyBlock = {
+    blockId: "",
+    name: "",
+    subjectName: "",
+    time: "",
+    repetition: "",
+  };
 
-  const userData = Object.fromEntries(formData);
+  studyBlock.blockId = formData.get("id")?.toString();
+  studyBlock.name = formData.get("name")?.toString();
+  studyBlock.subjectName = formData.get("subjectName")?.toString();
+  studyBlock.time = formData.get("time")?.toString();
+  studyBlock.repetition = formData.get("repetition")?.toString();
 
-  const updatedStudyBlocks = existingStudyBlocks.concat(userData);
-  storeStudyBlocks(updatedStudyBlocks);
+  addStudyBlock(studyBlock);
 
-  return null;
+  return redirect("/main");
 }
 
 export function links() {
