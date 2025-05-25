@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import { Form } from "@remix-run/react";
+import { Form, Link } from "@remix-run/react";
 
 import styles from "~/styles/createSubject.css";
 
@@ -19,6 +19,7 @@ export default function ColorCode() {
         <hr></hr>
         <input type="submit" name="return" value="Guardar y volver"></input>
       </Form>
+      <Link to={"/configurationForm"}>Cancelar</Link>
     </>
   );
 }
