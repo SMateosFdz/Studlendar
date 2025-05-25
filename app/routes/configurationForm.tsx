@@ -1,12 +1,12 @@
 import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Form, Link, redirect, useLoaderData } from "@remix-run/react";
-import { getStoredSubjects } from "~/data/subjects";
+import { prisma } from "~/data/database.server";
 import styles from "~/styles/configure.css";
 
 export async function loader(){
-  const existingSubjects = await getStoredSubjects();
+  const allSubjects = await prisma.subject.findMany();
 
-  return existingSubjects.length;
+  return allSubjects.length;
 }
 
 export const meta: MetaFunction = () => {
@@ -23,21 +23,27 @@ export default function Configure() {
       <h1>Bienvenido a Studlendar</h1>
       <h2>Configuración de la aplicación</h2>
       <div id="sessionForm">
-        <Link to="/createSubject">
+        <Link className="sessionForm__link" to="/createSubject">
           Crear nueva asignatura
         </Link>
-        <Link to="/notifications">
+        <br></br>
+        <Link className="sessionForm__link" to="/notifications">
           Configurar notificaciones
         </Link>
-        <Link to="/colorCode">
+        <br></br>
+        <Link className="sessionForm__link" to="/colorCode">
           Configurar código de color
         </Link>
-        <hr></hr>
+        <br></br>
         <Form method="post">
           <input
             type="submit"
             name="move"
-            value= {number === 0 ? "Crea una asignatura antes de avanzar al paso siguiente" : "Guardar e ir al siguiente paso"}
+            value=
+            {number === 0 ?
+              "Crea una asignatura antes de avanzar al paso siguiente" : 
+              "Guardar e ir al calendario"
+            }
             disabled={number === 0}
           ></input>
         </Form>
@@ -49,13 +55,15 @@ export default function Configure() {
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const intent = formData.get("move");
-  const existingSubjects = await getStoredSubjects();
-  const number = existingSubjects.length;
+  const allSubjects = await prisma.subject.findMany();
+  const number = allSubjects.length;
 
   if (intent === "Guardar e ir al siguiente paso") {
     if (number !== 0) {
       return redirect("/proposals");
     }
+  } else{
+    return redirect("/main");
   }
 
   throw new Error("Acción desconocida");

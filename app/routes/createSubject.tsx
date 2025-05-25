@@ -1,8 +1,10 @@
-import type { ActionFunctionArgs, MetaFunction} from "@remix-run/node";
+import type { ActionFunctionArgs,  MetaFunction} from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Link, useActionData } from "@remix-run/react";
 import { addSubject } from "~/data/subjects.server";
 import styles from "~/styles/createSubject.css";
+import { userId } from "~/cookies.server";
+import { prisma } from "~/data/database.server";
 
 export const meta: MetaFunction = () => {
   return [
@@ -56,10 +58,10 @@ export default function CreateSubject() {
         <input type="date" id="endDate" name="endDate" required></input>
         <hr></hr>
         <input type="submit" name="return" value="Guardar y crear una nueva asignatura"></input>
-        <input type="submit" name="return" value="Guardar y volver"></input>
+        <input type="submit" name="return" value="Guardar y avanzar a propuestas"></input>
       </form>
-      <Link to={"/configurationForm"}>Cancelar</Link>
       {data?.message && <p>{data.message}</p>}
+      <Link to={"/configurationForm"}>Cancelar</Link>
     </>
   );
 }
@@ -68,9 +70,28 @@ export async function action( {request}: ActionFunctionArgs) {
   const formData = await request.formData();
   const intent = formData.get("return");
   const subjectData = Object.fromEntries(formData);
+  const cookie = await userId.parse(request.headers.get("Cookie"));
+  let sameName = false;
+  
 
   if (intent === "Cancelar") {
     return redirect("/configurationForm");
+  }
+
+  const existingSubjects = await prisma.subject.findMany({
+    where: { authorId: cookie.userId },
+  });
+
+  console.log(subjectData.name.toString());
+
+  existingSubjects.forEach((subject) => {
+    if(subject.name == subjectData.name.toString()){
+      sameName = true;
+    }
+  })
+
+  if(sameName){
+    return { message: "El nombre de esta asignatura ya existe. Escoja otro" };
   }
 
   const [year, month, day] = subjectData.initialDate.toString().split("-");
@@ -79,23 +100,29 @@ export async function action( {request}: ActionFunctionArgs) {
   if(year > year2){
     return { message: "La año de fin debe ser mayor que la de inicio" };
   } else{
-    if(month > month2){
-      return { message: "El mes de fin debe ser mayor que la de inicio" };
+    if(year == year2){
+      if(month > month2){
+       return { message: "El mes de fin debe ser mayor que la de inicio" };
+      }
     }else {
-      if(day >= day2){
-        return { message: "El día de fin debe ser mayor que la de inicio" };
+      if(month == month2){
+        if(day >= day2){
+          return { message: "El día de fin debe ser mayor que la de inicio" };
+        }
       }
     }
   }
 
+  const newData = Object.assign({}, subjectData, { author: cookie.userId});
+
   if(intent === "Guardar y crear una nueva asignatura"){
-    addSubject(subjectData);
+    addSubject(newData);
     return redirect("/createSubject");
   }
 
-  if(intent === "Guardar y volver"){
-    addSubject(subjectData);
-    return redirect("/configurationForm");
+  if(intent === "Guardar y avanzar a propuestas"){
+    addSubject(newData);
+    return redirect("/proposals");
   }
 
   throw new Error("Acción desconocida");

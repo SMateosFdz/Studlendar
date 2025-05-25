@@ -1,24 +1,23 @@
 /* eslint-disable array-callback-return */
 import calendarStyles from "~/styles/calendar.css";
 import proposalsStyles from "~/styles/proposals.css";
-import { getStoredSubjects } from "~/data/subjects";
 import { Form, redirect, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
-import type { ActionFunctionArgs } from "@remix-run/node";
-import { getStoredStudyBlocks, storeStudyBlocks } from "~/data/studyBlocks";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { userId } from "~/cookies.server";
+import { prisma } from "~/data/database.server";
+import { addStudyBlock } from "~/data/studyBlocks.server";
 
 export function showSubjectProposals(subject: any) {
   const pool = Array.from({ length: 193 }, (_, i) => i);
   const result = [];
 
-  for (let i = 0; i < subject.horas; i++) {
+  for (let i = 0; i < subject.sessions; i++) {
     let random;
     do {
       random = Math.floor(Math.random() * pool.length);
     } while (random % 8 === 0);
-    let chosen = pool.splice(random, 1)[0];
-    chosen = chosen + 24;
-    result.push(chosen);
+    result.push(random + 24);
   }
 
   const proposal: Proposal = {
@@ -29,11 +28,30 @@ export function showSubjectProposals(subject: any) {
   return proposal;
 }
 
-export async function loader() {
-  const existingSubjects = await getStoredSubjects();
+export async function loader({request}: LoaderFunctionArgs) {
+  const cookie = await userId.parse(request.headers.get("Cookie"));
+  const existingSubjects = await prisma.subject.findMany({
+    where: { authorId: cookie.userId },
+  });
+
   let selectedValues: Proposal[] = [];
-  existingSubjects.map((subject: any) => {
-    selectedValues.push(showSubjectProposals(subject));
+
+  const values = existingSubjects.map(async (subject) => {
+    const studyBlocks = await prisma.studyBlock.findMany({
+      where: { subjectName: subject.name },
+    });
+    if(studyBlocks.length == 0){
+      const proposal = showSubjectProposals(subject);
+      return proposal;
+    }
+  });
+
+
+  let selected = await Promise.all(values);
+  selectedValues.push(...selected.flat());
+
+  selectedValues = selectedValues.filter(function(element){
+    return element !== undefined;
   });
 
   return selectedValues;
@@ -46,7 +64,7 @@ interface Proposal {
 
 interface StudyBlock {
   id: string;
-  subjects: string;
+  subjectName: string;
   time: string;
   repetition: string;
 }
@@ -183,7 +201,7 @@ export default function Proposals() {
               <input
                 type="submit"
                 name="close"
-                value="Guardar y cerrar"
+                value="Guardar y volver a configuración"
               ></input>
             </Form>
           </div>
@@ -202,18 +220,18 @@ export async function action({ request }: ActionFunctionArgs) {
     if (key.split(/(\d+)/)[0] !== "close") {
       elements.push({
         id: element.toString(),
-        subjects: key.split(/(\d+)/)[0],
+        subjectName: key.split(/(\d+)/)[0],
         time: "1",
         repetition: "semanal",
       });
     }
   });
 
-  const existingStudyBlocks = await getStoredStudyBlocks();
-  const updatedStudyBlocks = existingStudyBlocks.concat(elements);
-  storeStudyBlocks(updatedStudyBlocks);
+  elements.forEach((element) => {
+    addStudyBlock(element);
+  })
 
-  return redirect("/main");
+  return redirect("/configurationForm");
 }
 
 export function links() {
