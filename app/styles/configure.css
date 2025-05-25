@@ -13,7 +13,7 @@ h2{
 }
 
 #sessionForm{
-    width: 50%;
+    width: 30%;
     border-radius: 10px;
     background-color: #466bad;
     margin: auto;
@@ -26,11 +26,7 @@ h2{
     border-radius: 10px;
 }
 
-#sessionForm input[type="radio"]{
-    display: inline;
-}
-
-#sessionForm input[type="reset"], #sessionForm input[type="submit"]{
+#sessionForm input[type="submit"]{
     background-color: #466bad;
     color: white;
     border: 1px solid white;
@@ -39,7 +35,7 @@ h2{
     border-radius: 10px;
 }
 
-#sessionForm input[type="reset"]:hover, #sessionForm input[type="submit"]:hover{
+#sessionForm input[type="submit"]:hover{
     background-color: white;
     color: #466bad;
     border: 1px solid #466bad;
@@ -48,25 +44,10 @@ h2{
     border-radius: 10px;
 }
 
-#sessionForm input[type="reset"]:disabled, #sessionForm input[type="submit"]:disabled{
-    background-color: grey;
-    color: white;
-    border: 1px solid #466bad;
-    padding: 5px;
-    margin: 10px;
-    border-radius: 10px;
-    cursor: not-allowed;
-}
-
-label{
-    display: inline;
-    color: white;
-    float: left;
-    margin: 20px;
-}
-
-#sessionForm a{
-    margin: 30px;
+.sessionForm__link{
+    display: block;
+    margin: auto;
+    width: 300px;
     text-decoration: none;
     text-align: center;
     color: white;
@@ -75,23 +56,12 @@ label{
     border-radius: 10px;
 }
 
-#sessionForm a:hover{
+.sessionForm__link:hover{
     color: #466bad;
     background-color: white;
-}
-
-fieldset{
-    margin: auto;
-    text-align: right;
-    border: 0 none;
-    margin: 20px;
 }
 
 #sessionForm button{
     float: right;
     margin: 20px;
-}
-
-hr{
-    clear: both;
 }
