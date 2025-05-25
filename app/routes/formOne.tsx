@@ -66,7 +66,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (intent === "Guardar e ir al siguiente paso") {
     if (number !== 0) {
-      return redirect("/configurationForm/formOne");
+      return redirect("/configurationForm");
     }
   }
 
