@@ -82,8 +82,6 @@ export async function action( {request}: ActionFunctionArgs) {
     where: { authorId: cookie.userId },
   });
 
-  console.log(subjectData.name.toString());
-
   existingSubjects.forEach((subject) => {
     if(subject.name == subjectData.name.toString()){
       sameName = true;
