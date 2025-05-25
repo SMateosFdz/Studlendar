@@ -1,14 +1,17 @@
 import type { ActionFunctionArgs} from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import { Form  } from "@remix-run/react";
+import { Form, Link  } from "@remix-run/react";
 
-import styles from "~/styles/formOne.css";
+import styles from "~/styles/notifications.css";
 
 export default function Notifications() {
   return (
     <>
-      <h1>Bienvenido a Studlendar</h1>
-      <h2>Configuración de notificaciones</h2>
+      <header>
+        <h1>Bienvenido a Studlendar</h1>
+      </header>
+      <main>
+        <h2>Configuración de notificaciones</h2>
       <Form method="post" id="sessionForm">
         <label htmlFor="not-rev-diaria">
           Notificaciones revisión diaria
@@ -72,6 +75,10 @@ export default function Notifications() {
         <hr></hr>
         <input type="submit" name="move" value="Guardar y volver"></input>
       </Form>
+      </main>
+      <footer>
+        <Link to={"/configurationForm"}>Cancelar</Link>
+      </footer>
     </>
   );
 }
