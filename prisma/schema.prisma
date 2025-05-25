@@ -14,16 +14,42 @@ datasource db {
 }
 
 model User {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  nameUser String @unique
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  nameUser String    @unique
   password String
+  subjects  Subject[]
 }
 
 model Subject {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  name String
-  sessions String
-  sessionOrg String
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  author      User     @relation(fields: [authorId], references: [nameUser])
+  authorId    String @unique
+  name        String @unique
+  sessions    String
+  sessionOrg  String
   initialDate DateTime
-  endDate DateTime
+  endDate     DateTime
+  StudyBlock StudyBlock[]
+  Event Event[]
+}
+
+model StudyBlock {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  subject Subject @relation(fields: [subjectName], references: [name])
+  subjectName String @unique
+  blockId String
+  name String
+  time String
+  repetition String
+}
+
+model Event {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  subject Subject @relation(fields: [subjectName], references: [name])
+  subjectName String @unique
+  blockId String
+  name String
+  color String
+  date DateTime
+  notes String
 }
