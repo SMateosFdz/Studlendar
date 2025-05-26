@@ -41,9 +41,9 @@ export default function FormOne() {
             ¿Quieres complementar los bloques con el método Pomodoro?
           </label>
           <fieldset id="pomodoro">
-            <input type="radio" value="si" name="pomodoro"></input>
+            <input type="radio" required value="si" name="pomodoro"></input>
             <label>Sí</label>
-            <input type="radio" value="no" name="pomodoro"></input>
+            <input type="radio" required value="no" name="pomodoro"></input>
             <label>No</label>
           </fieldset>
           <hr></hr>
