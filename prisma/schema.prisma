@@ -47,7 +47,7 @@ model Event {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   subject Subject @relation(fields: [subjectName], references: [name])
   subjectName String @unique
-  blockId String
+  /* blockId String l - pending to know how to calculate it */
   name String
   color String
   date DateTime
