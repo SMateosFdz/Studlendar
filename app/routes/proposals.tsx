@@ -63,10 +63,11 @@ interface Proposal {
 }
 
 interface StudyBlock {
-  id: string;
+  name: string;
   subjectName: string;
   time: string;
   repetition: string;
+  blockId: string;
 }
 
 export default function Proposals() {
@@ -181,7 +182,7 @@ export default function Proposals() {
                     {subject.proposals.map((element, index) => (
                       // eslint-disable-next-line react/jsx-key
                       <input
-                        id={subject.id + index}
+                        id={"" + index}
                         type="checkbox"
                         value={element}
                         name={subject.id + index}
@@ -219,10 +220,11 @@ export async function action({ request }: ActionFunctionArgs) {
   formData.forEach((element, key) => {
     if (key.split(/(\d+)/)[0] !== "close") {
       elements.push({
-        id: element.toString(),
+        name: key.toString(),
         subjectName: key.split(/(\d+)/)[0],
         time: "1",
         repetition: "semanal",
+        blockId: element.toString(),
       });
     }
   });
