@@ -36,8 +36,6 @@ export default function CreateSubject() {
           <label>2h</label>
           <input type="radio" value="3" name="sessions"></input>
           <label>3h</label>
-          <input type="radio" value="otro" name="sessions"></input>
-          <label>Otro</label>
         </fieldset>
         <hr></hr>
         <label htmlFor="sessionOrg">Organización de las sesiones de estudio</label>
@@ -59,9 +57,12 @@ export default function CreateSubject() {
         <hr></hr>
         <input type="submit" name="return" value="Guardar y crear una nueva asignatura"></input>
         <input type="submit" name="return" value="Guardar y avanzar a propuestas"></input>
+        <input type="submit" name="return" value="Guardar e importar fichero con eventos"></input>
       </form>
-      {data?.message && <p>{data.message}</p>}
-      <Link to={"/configurationForm"}>Cancelar</Link>
+      <footer>
+        {data?.message && <p>{data.message}</p>}
+        <Link to={"/configurationForm"}>Cancelar</Link>
+      </footer>
     </>
   );
 }
@@ -121,6 +122,11 @@ export async function action( {request}: ActionFunctionArgs) {
   if(intent === "Guardar y avanzar a propuestas"){
     addSubject(newData);
     return redirect("/proposals");
+  }
+
+  if(intent === "Guardar e importar fichero con eventos"){
+    addSubject(newData);
+    return redirect("/importFile");
   }
 
   throw new Error("Acción desconocida");
