@@ -3,20 +3,22 @@
     text-align: center;
 }
 
+h1{
+    color: #03045E;
+}
+
 h2{
-    text-align: center;
-    color: rgb(4, 0, 250);
+    color: #023E8A;
     animation: slideIn 2s;
 }
 
 #colorForm{
     width: 50%;
     border-radius: 10px;
-    background-color: rgb(114, 124, 255);
+    background-color: #023E8A;
     margin: auto;
     padding: 15px;
     height: 50%;
-    text-align: center;
     animation: slideIn 2s;
 }
 
@@ -37,7 +39,7 @@ h2{
 
 #colorForm input[type="submit"]{
     float: none;
-    background-color: rgb(114, 124, 255);
+    background-color: #023E8A;
     color: white;
     border: 1px solid white;
     padding: 5px;
@@ -47,11 +49,38 @@ h2{
 
 #colorForm input[type="submit"]:hover{
     background-color: white;
-    color: rgb(114, 124, 255);
-    border: 1px solid rgb(114, 124, 255);
+    color: #023E8A;
+    border: 1px solid #023E8A;
     padding: 5px;
     margin: 10px;
     border-radius: 10px;
+}
+
+footer{
+    margin: 20px;
+}
+
+a {
+  display: block;
+  width: fit-content;
+  margin: auto;
+  text-decoration: none;
+  text-align: center;
+  color: white;
+  background-color: #023E8A;
+  padding: 2px 5px;
+  border: 1px solid white;
+  border-radius: 10px;
+}
+
+a:hover {
+  color: #023E8A;
+  background-color: white;
+  border: 1px solid #023E8A;
+}
+
+hr{
+    clear: both;
 }
 
 @keyframes slideIn {
