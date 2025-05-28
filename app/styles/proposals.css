@@ -1,6 +1,6 @@
 #title {
   text-align: center;
-  color: blue;
+  color: #03045E;
   margin-bottom: 20px;
 }
 
@@ -20,11 +20,31 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  background-color: grey;
+  background-color: #CAF0F8;
   padding: 10px;
   border-radius: 10px;
   text-align: center;
   width: 300px;
+}
+
+.proposals-visible--true h2{
+  color: #023E8A;
+}
+
+.proposals-visible--true input[type="checkbox"]{
+  cursor: pointer
+}
+
+.proposals-visible--true input[type="submit"]{
+  color: white;
+  background-color: #023E8A;
+  border-radius: 10px;
+}
+
+.proposals-visible--true input[type="submit"]:hover{
+  cursor: pointer;
+  background-color: white;
+  color: #02388A;
 }
 
 .proposals-visible--false {

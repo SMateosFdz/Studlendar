@@ -5,7 +5,7 @@
 
 h1 {
   text-align: center;
-  color: rgb(4, 0, 250);
+  color: #023E8A;
 }
 
 h2 {
@@ -15,7 +15,7 @@ h2 {
 #sessionForm {
   width: 50%;
   border-radius: 10px;
-  background-color: #466bad;
+  background-color: #023E8A;
   margin: auto;
   padding: 15px;
   text-align: center;
@@ -33,7 +33,7 @@ h2 {
 
 #sessionForm input[type="reset"],
 #sessionForm input[type="submit"] {
-  background-color: #466bad;
+  background-color:#023E8A;
   color: white;
   border: 1px solid white;
   padding: 5px;
@@ -44,8 +44,8 @@ h2 {
 #sessionForm input[type="reset"]:hover,
 #sessionForm input[type="submit"]:hover {
   background-color: white;
-  color: #466bad;
-  border: 1px solid #466bad;
+  color: #023E8A;
+  border: 1px solid #023E8A;
   padding: 5px;
   margin: 10px;
   border-radius: 10px;
@@ -55,7 +55,7 @@ h2 {
 #sessionForm input[type="submit"]:disabled {
   background-color: grey;
   color: white;
-  border: 1px solid #466bad;
+  border: 1px solid #023E8A;
   padding: 5px;
   margin: 10px;
   border-radius: 10px;
@@ -80,14 +80,16 @@ a {
   text-decoration: none;
   text-align: center;
   color: white;
+  background-color: #023E8A;
   padding: 2px 5px;
   border: 1px solid white;
   border-radius: 10px;
 }
 
 a:hover {
-  color: #466bad;
+  color: #023E8A;
   background-color: white;
+  border: 1px solid #023E8A;
 }
 
 fieldset {

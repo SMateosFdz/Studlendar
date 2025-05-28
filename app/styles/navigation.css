@@ -22,25 +22,26 @@
 }
 
 .nav-item > .link{
-    color: #466bad;
+    color: #023E8A;
     text-decoration: none;
     margin: 20px;
-    color: #466bad;
-    border: 2px solid #466bad;
+    color: #023E8A;
+    border: 2px solid #023E8A;
     padding: 5px;
     border-radius: 10px;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+    background-color: white;
 } 
 
 .nav-item > .link:hover{
-    background-color: #466bad;
+    background-color: #023E8A;
     color: white;
 }
 
-#title{
-    color: #466bad;
+#title, #subtitle{
+    color: #023E8A;
     text-align: center;
     height: 20px;
     animation: slideIn 2s;
