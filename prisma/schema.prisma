@@ -30,6 +30,7 @@ model Subject {
   initialDate DateTime
   endDate     DateTime
   StudyBlock StudyBlock[]
+  ClassBlock ClassBlock[]
   Event Event[]
 }
 
@@ -40,6 +41,15 @@ model StudyBlock {
   blockId String
   name String
   time String
+  repetition String
+}
+
+model ClassBlock {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  subject Subject @relation(fields: [subjectName], references: [name])
+  subjectName String @unique
+  blockId String
+  name String
   repetition String
 }
 
