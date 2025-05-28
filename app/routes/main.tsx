@@ -8,14 +8,12 @@ import { useState } from "react";
 import { userId } from "~/cookies.server";
 import { prisma } from "~/data/database.server";
 import { addStudyBlock } from "~/data/studyBlocks.server";
+import { addClassBlock } from "~/data/classBlocks.server";
+import { addEvent } from "~/data/events.server";
+import type { StudyBlock } from "~/interfaces/studyblock";
+import type { ClassBlock } from "~/interfaces/classblock";
+import type { Event } from "~/interfaces/event";
 
-interface StudyBlock {
-  blockId: string;
-  name: string;
-  subjectName: string;
-  time: string;
-  repetition: string;
-}
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const cookie = await userId.parse(request.headers.get("Cookie"));
@@ -52,6 +50,7 @@ export default function Main() {
   const [typeBlock, setTypeBlock] = useState(false);
   const [recordHours, setRecordHours] = useState(false);
   const [subjectEvent, setSubjectEvent] = useState(false);
+  const [isToggled, setIsToggled] = useState(false);
   const [editingId, setEditingId] = useState(0);
   const [currentSelection, setCurrentSelection] = useState("");
 
@@ -96,33 +95,54 @@ export default function Main() {
     setSubjectEvent(!subjectEvent);
   }
 
+  function handleToggle() {
+    setIsToggled(!isToggled);
+  }
+
   function handlePopup(id: number) {
     let form;
     let subject = "";
     let name = "";
     if (studyBlocks.length != 0) {
-      studyBlocks.map((studyBlock: { blockId: number; name: string; subjectName: string; }) => {
-        if (studyBlock.blockId == id) {
-          name = studyBlock.name;
-          subject = studyBlock.subjectName;
+      studyBlocks.map(
+        (studyBlock: {
+          blockId: number;
+          name: string;
+          subjectName: string;
+        }) => {
+          if (studyBlock.blockId == id) {
+            name = studyBlock.name;
+            subject = studyBlock.subjectName;
+          }
         }
-      });
+      );
     }
     typeBlock === false
       ? (form = (
           <>
             <h2 className="popup__title">
-              {"Nuevo bloque de estudio - " + currentSelection}
+              {`Nuevo bloque de ${isToggled ? "estudio" : "clase"} - ` +
+                currentSelection}
             </h2>
             <Form method="post">
               <input type="hidden" name="id" value={editingId} />
-              <label htmlFor="name">Nombre del bloque:</label>
               <input
-                type="text"
-                id="name"
-                name="name"
-              ></input>
-              <br></br>
+                type="hidden"
+                name="type"
+                value={isToggled ? "estudio" : "clase"}
+              />
+              <div className="popup__type">
+                <p>Bloque de clase</p>
+                <label className="switch">
+                  <input type="checkbox" onChange={handleToggle} />
+                  <span className="slider round"></span>
+                </label>
+                <p>Bloque de estudio</p>
+              </div>
+              <hr></hr>
+              <label htmlFor="name">Nombre del bloque:</label>
+              <input type="text" id="name" name="name"></input>
+              <hr></hr>
               <label htmlFor="subjectName">Asignatura:</label>
               <select
                 name="subjectName"
@@ -136,22 +156,26 @@ export default function Main() {
                   </option>
                 ))}
               </select>
-              <br></br>
-              <label htmlFor="time">Tiempo de estudio: </label>
-              <input
-                type="number"
-                name="time"
-                id="time"
-                min={1}
-                defaultValue={1}
-              ></input>
-              <br></br>
+              <hr></hr>
+              {isToggled && (
+                <>
+                  <label htmlFor="time">Tiempo de estudio: </label>
+                  <input
+                    type="number"
+                    name="time"
+                    id="time"
+                    min={1}
+                    defaultValue={1}
+                  ></input>
+                  <hr></hr>
+                </>
+              )}
               <select name="repetition" id="repetition">
                 <option value="no-rep">No se repite</option>
                 <option value="diario">Se repite cada día</option>
                 <option value="semanal">Se repite cada semana</option>
               </select>
-              <br></br>
+              <hr></hr>
               <input
                 type="submit"
                 name="return"
@@ -347,13 +371,14 @@ export default function Main() {
             </span>
             <h2>Crear nuevo evento</h2>
             <form method="post" id="sessionForm">
+              <input type="hidden" name="id" value="event" />
               <label htmlFor="name">Nombre del evento: </label>
               <input type="text" id="name" name="name"></input>
               <hr></hr>
-              <label htmlFor="subjects">Asignatura:</label>
+              <label htmlFor="subjectName">Asignatura:</label>
               <select
-                name="subjects"
-                id="subjects"
+                name="subjectName"
+                id="subjectName"
                 value={currentSelection}
                 onChange={handleSelectionChange}
               >
@@ -365,14 +390,14 @@ export default function Main() {
               </select>
               <hr></hr>
               <label htmlFor="color">Color asociado:</label>
-              <input id="color" type="color"></input>
+              <input id="color" name="color" type="color"></input>
               <hr></hr>
-              <label htmlFor="fecha">Fecha del evento:</label>
-              <input type="date" id="fecha" name="fecha"></input>
+              <label htmlFor="date">Hora y fecha del evento:</label>
+              <input type="datetime-local" id="date" name="date"></input>
               <hr></hr>
-              <label htmlFor="notas">Notas: </label>
+              <label htmlFor="notes">Notas: </label>
               <br></br>
-              <textarea></textarea>
+              <textarea id="notes" name="notes"></textarea>
               <hr></hr>
               <input
                 type="submit"
@@ -390,21 +415,56 @@ export default function Main() {
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
 
-  let studyBlock: StudyBlock = {
-    blockId: "",
-    name: "",
-    subjectName: "",
-    time: "",
-    repetition: "",
-  };
+  if (formData.get("id")?.toString() == "event") {
+    let event: Event = {
+      name: "",
+      color: "",
+      date: "",
+      notes: "",
+      subjectName: "",
+    };
 
-  studyBlock.blockId = formData.get("id")?.toString();
-  studyBlock.name = formData.get("name")?.toString();
-  studyBlock.subjectName = formData.get("subjectName")?.toString();
-  studyBlock.time = formData.get("time")?.toString();
-  studyBlock.repetition = formData.get("repetition")?.toString();
+    event.name = formData.get("name")?.toString();
+    event.color = formData.get("color")?.toString();
+    event.date = formData.get("date")?.toString();
+    event.notes = formData.get("notes")?.toString();
+    event.subjectName = formData.get("subjectName")?.toString();
 
-  addStudyBlock(studyBlock);
+    addEvent(event);
+  } else {
+    if (formData.get("type")?.toString() == "estudio") {
+      let studyBlock: StudyBlock = {
+        blockId: "",
+        name: "",
+        subjectName: "",
+        time: "",
+        repetition: "",
+      };
+
+      studyBlock.blockId = formData.get("id")?.toString();
+      studyBlock.name = formData.get("name")?.toString();
+      studyBlock.subjectName = formData.get("subjectName")?.toString();
+      studyBlock.time = formData.get("time")?.toString();
+      studyBlock.repetition = formData.get("repetition")?.toString();
+
+      addStudyBlock(studyBlock);
+    } else {
+      let classBlock: ClassBlock = {
+        blockId: "",
+        name: "",
+        subjectName: "",
+        repetition: "",
+      };
+
+      classBlock.blockId = formData.get("id")?.toString();
+      classBlock.name = formData.get("name")?.toString();
+      classBlock.subjectName = formData.get("subjectName")?.toString();
+      classBlock.time = formData.get("time")?.toString();
+      classBlock.repetition = formData.get("repetition")?.toString();
+
+      addClassBlock(classBlock);
+    }
+  }
 
   return redirect("/main");
 }
