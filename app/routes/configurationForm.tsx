@@ -1,18 +1,17 @@
 import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Form, Link, redirect, useLoaderData } from "@remix-run/react";
+import { userId } from "~/cookies.server";
 import { prisma } from "~/data/database.server";
 import styles from "~/styles/configure.css";
 
-export async function loader(){
+export async function loader() {
   const allSubjects = await prisma.subject.findMany();
 
   return allSubjects.length;
 }
 
 export const meta: MetaFunction = () => {
-  return [
-    { title: "Studlendar" },
-  ];
+  return [{ title: "Studlendar" }];
 };
 
 export default function Configure() {
@@ -39,10 +38,10 @@ export default function Configure() {
           <input
             type="submit"
             name="move"
-            value=
-            {number === 0 ?
-              "Crea una asignatura antes de avanzar al paso siguiente" : 
-              "Guardar e ir al calendario"
+            value={
+              number === 0
+                ? "Crea una asignatura antes de avanzar al paso siguiente"
+                : "Ir al calendario"
             }
             disabled={number === 0}
           ></input>
@@ -53,24 +52,40 @@ export default function Configure() {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  const formData = await request.formData();
-  const intent = formData.get("move");
-  const allSubjects = await prisma.subject.findMany();
-  const number = allSubjects.length;
+  let selectedValues = [];
+  let flag = false;
+  const cookie = await userId.parse(request.headers.get("Cookie"));
+  const allSubjects = await prisma.subject.findMany({
+    where: { authorId: cookie.userId },
+  });
 
-  if (intent === "Guardar e ir al siguiente paso") {
-    if (number !== 0) {
-      return redirect("/proposals");
+  const values = allSubjects.map(async (subject) => {
+    const studyBlocks = await prisma.studyBlock.findMany({
+      where: { subjectName: subject.name },
+    });
+    if (studyBlocks.length == 0) {
+      return true;
+    }else{
+      return false;
     }
-  } else{
+  });
+
+  let selected = await Promise.all(values);
+  selectedValues.push(...selected.flat());
+
+  selectedValues.forEach((value) => {
+    if(value){
+      flag = true;
+    }
+  })
+
+  if (flag) {
+    return redirect("/proposals");
+  } else {
     return redirect("/main");
   }
-
-  throw new Error("Acción desconocida");
 }
 
 export function links() {
-  return [
-    { rel: "stylesheet", href: styles },
-  ];
+  return [{ rel: "stylesheet", href: styles }];
 }
