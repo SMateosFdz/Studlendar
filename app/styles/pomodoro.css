@@ -1,6 +1,6 @@
-#pomodoro{
-    background-color: #466bad;
-    border: 1px solid #466bad;
+.pomodoro{
+    background-color: #023E8A;
+    border: 1px solid #023E8A;
     text-align: center;
     width: fit-content;
     margin: auto;
@@ -9,43 +9,57 @@
     animation: slideIn 2s;
 }
 
-#pomodoro h1{
-    color: white;
-}
-
-#pomodoro label{
-    margin-right: 10px;
-    color: white;
-}
-
-.session-type{
-    color: white;
-    margin-top: 10px;
-}
-
-.timer-display{
-    background-color: #466bad;
-    color: white;
-    width: fit-content;
-    margin: auto;
-    padding: 10px;
+.pomodoro h1{
+    color: #03045E;
+    background-color: #CAF0F8;
     border-radius: 10px;
 }
 
-.buttons button{
-    color: white;
-    background-color: #466bad;
-    border: 1px solid black;
+.pomodoro__mode-buttons button, .pomodoro__controls button{
+    margin: 10px;
+    font-size: 1.5rem;
+    border: 1px solid #CAF0F8;
     border-radius: 10px;
-    padding: 5px;
-    margin: 20px;
+    background-color: #CAF0F8;
 }
 
-.buttons button:hover{
-    background-color: white;
-    color: #466bad;
+.pomodoro__mode-buttons button:hover, .pomodoro__controls button:hover{
     cursor: pointer;
+    background-color: #00B4D8;
+    border: 1px solid #00B4D8;
+    box-shadow: 2px 3px 5px white;
 }
+
+.pomodoro__timer-display{
+    border: 1px solid #CAF0F8;
+    width: fit-content;
+    margin: 10px auto;
+    padding: 5px 20px;
+    font-size: 1.5rem;
+    background-color: white;
+    color: #03045E;
+    border-radius: 10px;
+}
+
+.pomodoro__duration-inputs{
+    margin: 30px auto 0px;
+    background-color: #CAF0F8;
+    border-radius: 10px;
+}
+
+.pomodoro__duration-inputs input{
+    margin: 10px;
+    font-size: 1rem;
+    width: 50px;
+}
+
+.pomodoro__duration-inputs label{
+    font-size: 1rem;
+    padding:5px;
+    background-color: #00B4D8;
+    border-radius: 10px;
+}
+
 
 @keyframes slideIn {
   0% {

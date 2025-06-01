@@ -1,3 +1,15 @@
 :root{
     text-align: center;
 }
+
+.studyMode__title{
+    color: #023E8A;
+}
+
+.studyMode__container {
+    min-width: fit-content;
+    width: 50%;
+    margin: auto;
+    border: 1px solid #023E8A;
+    border-radius: 20px;
+}
