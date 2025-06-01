@@ -10,7 +10,7 @@ export async function addClassBlock(classBlockData) {
             subject: {
                 connect: {name: classBlockData.subjectName},
             },
-            
+            time: classBlockData.time,
         }});
 
         return {ok: true};

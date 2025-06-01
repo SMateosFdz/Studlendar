@@ -3,4 +3,5 @@ export interface ClassBlock {
   name: string;
   subjectName: string;
   repetition: string;
+  time: string;
 }
