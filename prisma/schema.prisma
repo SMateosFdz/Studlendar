@@ -50,6 +50,7 @@ model ClassBlock {
   subjectName String @unique
   blockId String
   name String
+  time String
   repetition String
 }
 
@@ -57,7 +58,7 @@ model Event {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   subject Subject @relation(fields: [subjectName], references: [name])
   subjectName String @unique
-  /* blockId String l - pending to know how to calculate it */
+  blockId String
   name String
   color String
   date DateTime
