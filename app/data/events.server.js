@@ -4,7 +4,7 @@ export async function addEvent(eventData) {
     try {
         await prisma.event.create({data: {
 
-            /* blockId : eventData.blockId, */
+            blockId : eventData.blockId,
             name: eventData.name,
             color: eventData.color,
             date: new Date(eventData.date),

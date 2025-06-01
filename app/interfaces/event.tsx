@@ -4,4 +4,5 @@ export interface Event {
   date: string;
   notes: string;
   subjectName: string;
+  blockId: string;
 }
