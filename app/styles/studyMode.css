@@ -1,5 +1,6 @@
 :root{
     text-align: center;
+    background-color: #caf0f8;
 }
 
 .studyMode__title{
@@ -12,4 +13,5 @@
     margin: auto;
     border: 1px solid #023E8A;
     border-radius: 20px;
+    background-color: white;
 }

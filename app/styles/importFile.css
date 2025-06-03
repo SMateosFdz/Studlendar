@@ -24,51 +24,46 @@
     margin: 10px auto;
 }
 
-.container label, .container button{
+.container button{
     border-radius: 10px;
     font-size: 1rem;
     background-color: white;
     color: black;
     padding: 5px;
+    margin-bottom: 10px;
 }
 
-.container label:hover, .container button:hover{
+.container button:hover{
     cursor: pointer;
     background-color: #03045E;
     color: white;
     box-shadow: 1px 1px 5px white;
 }
 
-/* .container #icsFile{
-    width: 0.1px;
-	height: 0.1px;
-	opacity: 0;
-	overflow: hidden;
-	position: absolute;
-	z-index: -1;
+.events-list{
+  border: 1px solid white;
+  border-radius: 10px;
+  padding: 10px;
 }
 
-.container #icsFile + label{
-    display: block;
+.events-list .event-item{
+  background-color: #CAF0F8;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 5px;
+  color: #03045E;
 }
 
-.container #icsFile:focus + label,
-.container #icsFile + label:hover{
-    bacursor: pointer;
-    background-color: #03045E;
-    color: white;
-    box-shadow: 1px 1px 5px white;
+.events-list label{
+  margin-right: 10px;
+  font-size: 1.25rem;
+}
+.events-list select{
+  font-size: 1rem;
 }
 
-.container #icsFile + label * {
-    pointer-events: none;
-} */
-
-.container .dragDropZone{
-    background-color: white;
-    border-radius: 10px;
-    color: black;
-    padding: 30px 10px;
+.events-list select, .events-list label{
+  display: inline-block;
 }
 
 .file-area input[type="file"] {

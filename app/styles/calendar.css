@@ -1,13 +1,15 @@
-:root{
-  background-color: #CAF0F8;
+:root {
+  background-color: #caf0f8;
+  overflow: hidden;
 }
 
-body, html {
+body,
+html {
   margin: 0;
   padding: 0;
 }
 
-.grid-container {
+/* .grid-container {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   grid-template-rows: repeat(24, 5fr);
@@ -16,14 +18,6 @@ body, html {
   padding-bottom: 30px;
   border-radius: 10px;
   animation: appear 2.5s;
-}
-
-.grid-item:first-child{
-  border-radius: 10px 0 0 0;
-}
-
-.grid-item:last-child {
-  border-radius: 0 0 10px 0;
 }
 
 .grid-item, .grid-block {
@@ -63,7 +57,97 @@ body, html {
   color: #ADE8F4;
 }
 
-.popup-show--true{
+.block-2{
+  grid-row: 1 / span 2;
+} */
+
+.calendar {
+  position: sticky;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 3dvw repeat(7, 13dvw);
+  grid-template-rows: 3dvh repeat(24, 3.4dvh);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+  border-radius: 8px;
+  width: 94dvw;
+}
+
+.calendar__corner {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+  background: #023e8a;
+  border-bottom: 1px solid black;
+  border-right: 1px solid black;
+  border-top-left-radius: 8px;
+}
+
+.calendar__day {
+  background: #023e8a;
+  border-bottom: 1px solid black;
+  border-right: 1px solid black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  user-select: none;
+}
+
+.calendar__hour {
+  border-bottom: 1px solid black;
+  border-right: 1px solid black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: white;
+  user-select: none;
+  font-weight: 500;
+  background-color: #023e8a;
+}
+
+.final-hour {
+  border-bottom-left-radius: 10px;
+}
+
+.final-day {
+  border-top-right-radius: 10px;
+}
+
+.final-grid {
+  border-bottom-right-radius: 10px;
+}
+
+.calendar__grid {
+  position: relative;
+  border-bottom: 1px solid black;
+  border-right: 1px solid black;
+  background: white;
+}
+
+.class-item {
+  background: #023e8a;
+  color: white;
+  max-width: auto;
+  border-radius: 6px;
+  padding: 5px;
+  box-shadow: 0 2px 8px rgb(79 70 229 / 0.4);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 1;
+}
+
+.class-item:hover {
+  background: #c7d2fe;
+  color: #023e8a;
+}
+
+.popup-show--true {
   display: block;
   position: fixed;
   top: 0;
@@ -77,35 +161,36 @@ body, html {
   animation: appear 1s;
 }
 
-.popup-show--false{
+.popup-show--false {
   display: none;
 }
 
-.close{
+.close {
   float: right;
 }
 
-.close:hover{
+.close:hover {
   cursor: pointer;
 }
 
-.show--true{
-  background-color: #CAF0F8;
+.show--true {
+  background-color: #caf0f8;
   width: 600px;
   padding: 10px;
   border-radius: 10px;
 }
 
-.show--true h2{
-  color: #023E8A;
+.show--true h2 {
+  color: #023e8a;
+  text-align: center;
 }
 
-.popup__title{
+.popup__title {
   text-align: center;
 }
 
 .block select,
-.block input:not([type="submit"]){
+.block input:not([type="submit"]) {
   float: right;
   margin: 10px;
 }
@@ -118,22 +203,22 @@ body, html {
   width: 100px;
 }
 
-.block input[type="submit"]{
+.block input[type="submit"] {
   text-align: center;
   margin: auto;
   float: right;
 }
 
-.popup__type{
+.popup__type {
   text-align: center;
   width: auto;
 }
 
-.popup__type p{
+.popup__type p {
   display: inline;
 }
 
-.popup__type label{
+.popup__type label {
   margin: 0 10px;
 }
 
@@ -144,7 +229,7 @@ body, html {
   height: 28px;
 }
 
-.switch input { 
+.switch input {
   opacity: 0;
   width: 0;
   height: 0;
@@ -158,8 +243,8 @@ body, html {
   right: 0;
   bottom: 0;
   background-color: #ccc;
-  -webkit-transition: .2s;
-  transition: .2s;
+  -webkit-transition: 0.2s;
+  transition: 0.2s;
 }
 
 .slider:before {
@@ -170,12 +255,12 @@ body, html {
   left: 4px;
   bottom: 4px;
   background-color: white;
-  -webkit-transition: .2s;
-  transition: .2s;
+  -webkit-transition: 0.2s;
+  transition: 0.2s;
 }
 
 input:checked + .slider {
-  background-color: #023E8A;
+  background-color: #023e8a;
 }
 
 input:checked + .slider:before {

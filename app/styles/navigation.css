@@ -1,50 +1,62 @@
-#full-navigation{
-    display: inline-block;
-    text-align: center;
-    width: 100%;
-    animation: slideIn 2s;
+#full-navigation {
+  margin-top: 20px;
+  text-align: center;
+  width: 100%;
+  animation: slideIn 2s;
 }
 
-.navigation{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    list-style: none;
-    height: 60px;
-    width: 100%;
+.navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  padding: 0;
+  list-style: none;
+  margin-bottom: 0px;
+  width: 100%;
+  height: 8dvh
 }
 
-.nav-item, .nav-item button{
-    flex: 1;
-    text-align: center;
-    font-size: 15px;
+.nav-item a button{
+  border-radius: 10px;
+  background-color: white;
+  border: 2px solid #023e8a;
 }
 
-.nav-item > .link{
-    color: #023E8A;
-    text-decoration: none;
-    margin: 20px;
-    color: #023E8A;
-    border: 2px solid #023E8A;
-    padding: 5px;
-    border-radius: 10px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    background-color: white;
-} 
-
-.nav-item > .link:hover{
-    background-color: #023E8A;
-    color: white;
+.nav-item a button, .nav-item button {
+  flex: 1;
+  text-align: center;
+  line-height: 2.5dvh;
+  font-size: 0.9vw;
+  height: 5dvh;
 }
 
-#title, #subtitle{
-    color: #023E8A;
-    text-align: center;
-    height: 20px;
-    animation: slideIn 2s;
+.nav-item > .link {
+  color: #023e8a;
+  text-decoration: none;
+  margin: 20px;
+  color: #023e8a;
+  border: 2px solid #023e8a;
+  padding: 5px;
+  border-radius: 10px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  background-color: white;
+}
+
+.nav-item a button:hover, .nav-item button:hover {
+  background-color: #023e8a;
+  color: white;
+  cursor: pointer;
+}
+
+#title,
+#subtitle {
+  color: #023e8a;
+  text-align: center;
+  height: 1dvh;
+  margin-top: 10px;
+  animation: slideIn 2s;
 }
 
 @keyframes slideIn {
