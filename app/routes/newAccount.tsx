@@ -50,7 +50,7 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   await addUser(userData);
-  return redirect("/formOne");
+  return redirect("/");
 }
 
 export function links() {
