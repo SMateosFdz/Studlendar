@@ -13,7 +13,7 @@ import { addEvent } from "~/data/events.server";
 import type { StudyBlock } from "~/interfaces/studyblock";
 import type { ClassBlock } from "~/interfaces/classblock";
 import type { Event } from "~/interfaces/event";
-
+import { getDateValues } from "~/utils/date";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const cookie = await userId.parse(request.headers.get("Cookie"));
@@ -22,6 +22,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
   });
 
   const existingStudyBlocks = [];
+  const existingEvents = [];
+  const existingClassBlocks = [];
 
   const studyBlocks = existingSubjects.map(async (subject) => {
     const studyBlocks = await prisma.studyBlock.findMany({
@@ -30,23 +32,44 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return studyBlocks;
   });
 
+  const events = existingSubjects.map(async (subject) => {
+    const events = await prisma.event.findMany({
+      where: { subjectName: subject.name },
+    });
+    return events;
+  });
+
+  const classBlocks = existingSubjects.map(async (subject) => {
+    const classBlocks = await prisma.classBlock.findMany({
+      where: { subjectName: subject.name },
+    });
+    return classBlocks;
+  });
+
   const allStudyBlocks = await Promise.all(studyBlocks);
+  const allEvents = await Promise.all(events);
+  const allClassBlocks = await Promise.all(classBlocks);
 
   existingStudyBlocks.push(...allStudyBlocks.flat());
+  existingEvents.push(...allEvents.flat());
+  existingClassBlocks.push(...allClassBlocks.flat());
 
   const response = {
     subjects: existingSubjects,
     studyBlocks: existingStudyBlocks,
+    events: existingEvents,
+    classBlocks: existingClassBlocks,
   };
 
   return json(response);
 }
 
 export default function Main() {
-  const { subjects, studyBlocks } = useLoaderData();
+  const { subjects, studyBlocks, events, classBlocks } = useLoaderData();
 
   const [selectedValues, setSelectedValues] = useState([]);
   const [editingBlock, setEditingBlock] = useState(false);
+  const [editingEvent, setEditingEvent] = useState(false);
   const [typeBlock, setTypeBlock] = useState(false);
   const [recordHours, setRecordHours] = useState(false);
   const [subjectEvent, setSubjectEvent] = useState(false);
@@ -54,18 +77,28 @@ export default function Main() {
   const [editingId, setEditingId] = useState(0);
   const [currentSelection, setCurrentSelection] = useState("");
 
-  function handleBlockClick(blockId: any, e: Event) {
+  function handleBlockClick(blockId: any, e: MouseEvent, toggled: boolean) {
     e.stopPropagation();
+    setEditingEvent(false);
     setEditingBlock(true);
     setEditingId(blockId);
     setTypeBlock(true);
+    setIsToggled(toggled);
     setCurrentSelection(selectedValues[blockId] || subjects[0].name);
   }
 
   function handleGridBlockClick(blockId: any) {
     setEditingBlock(true);
+    setEditingEvent(false);
     setEditingId(blockId);
     setTypeBlock(false);
+    setCurrentSelection(selectedValues[blockId] || subjects[0].name);
+  }
+
+  function handleEventClick(blockId: any, e: MouseEvent) {
+    setEditingEvent(true);
+    setEditingBlock(true);
+    setEditingId(blockId);
     setCurrentSelection(selectedValues[blockId] || subjects[0].name);
   }
 
@@ -101,23 +134,121 @@ export default function Main() {
 
   function handlePopup(id: number) {
     let form;
-    let subject = "";
-    let name = "";
-    if (studyBlocks.length != 0) {
-      studyBlocks.map(
-        (studyBlock: {
-          blockId: number;
-          name: string;
-          subjectName: string;
-        }) => {
-          if (studyBlock.blockId == id) {
-            name = studyBlock.name;
-            subject = studyBlock.subjectName;
+    let subject,
+      name,
+      time,
+      date = "";
+
+    if (editingEvent) {
+      if (events.length != 0) {
+        events.map(
+          (event: {
+            name: string;
+            subjectName: string;
+            date: string;
+            blockId: number;
+          }) => {
+            const { year, month, hours, minutes, dayOfWeek } = getDateValues(
+              event.date
+            );
+            if (event.blockId == id) {
+              name = event.name;
+              subject = event.subjectName;
+              date =
+                date + year + "-" + month.toString().padStart(2, "0") + "-" + dayOfWeek.toString().padStart(2, "0") + "T" + hours + ":" + minutes.toString().padStart(2, "0");
+            }
           }
+        );
+      }
+    } else {
+      if(isToggled){
+        if (studyBlocks.length != 0) {
+        studyBlocks.map(
+          (studyBlock: {
+            blockId: number;
+            name: string;
+            subjectName: string;
+            time: string;
+          }) => {
+            if (studyBlock.blockId == id) {
+              name = studyBlock.name;
+              subject = studyBlock.subjectName;
+              time = studyBlock.time;
+            }
+          }
+        );
+      }
+      }else{
+        if(classBlocks.length != 0){
+          classBlocks.map(
+            (classBlock : {
+              blockId: number;
+              name: string;
+              subjectName: string;
+              time: string;
+            }) => {
+              if(classBlock.blockId == id){
+                name = classBlock.name;
+                subject = classBlock.subjectName;
+                time = classBlock.time;
+              }
+            }
+          )
         }
-      );
+      }
     }
-    typeBlock === false
+
+    editingEvent === true
+      ? (form = (
+          <>
+            <h2 className="popup__title">{`Evento`}</h2>
+            <Form method="post">
+              <label htmlFor="blockName">Nombre del evento:</label>
+              <input
+                type="text"
+                id="blockName"
+                name="blockName"
+                defaultValue={name}
+              ></input>
+              <hr></hr>
+              <label htmlFor="subjectName">Asignatura:</label>
+              <input
+                id="subjectName"
+                name="subjectName"
+                defaultValue={subject}
+                readOnly
+              ></input>
+              <hr></hr>
+
+              <label htmlFor="time">Fecha: </label>
+              <input
+                type="datetime-local"
+                name="time"
+                id="time"
+                value={date}
+                readOnly
+              ></input>
+              <hr></hr>
+
+              <select name="repetition" id="repetition">
+                <option value="no-rep">No se repite</option>
+                <option value="diario">Se repite cada día</option>
+                <option value="semanal">Se repite cada semana</option>
+              </select>
+              <hr></hr>
+              <label htmlFor="completed">Completado: </label>
+              <input type="checkbox" name="completed" id="completed"></input>
+              <hr></hr>
+              <input
+                type="submit"
+                name="return"
+                value="Guardar y volver"
+                onClick={handleFormSubmit}
+              ></input>
+            </Form>
+          </>
+        ))
+      : typeBlock === false
       ? (form = (
           <>
             <h2 className="popup__title">
@@ -140,8 +271,8 @@ export default function Main() {
                 <p>Bloque de estudio</p>
               </div>
               <hr></hr>
-              <label htmlFor="name">Nombre del bloque:</label>
-              <input type="text" id="name" name="name"></input>
+              <label htmlFor="blockName">Nombre del bloque:</label>
+              <input type="text" id="blockName" name="blockName"></input>
               <hr></hr>
               <label htmlFor="subjectName">Asignatura:</label>
               <select
@@ -157,19 +288,17 @@ export default function Main() {
                 ))}
               </select>
               <hr></hr>
-              {isToggled && (
-                <>
-                  <label htmlFor="time">Tiempo de estudio: </label>
-                  <input
-                    type="number"
-                    name="time"
-                    id="time"
-                    min={1}
-                    defaultValue={1}
-                  ></input>
-                  <hr></hr>
-                </>
-              )}
+
+              <label htmlFor="time">Tiempo de estudio: </label>
+              <input
+                type="number"
+                name="time"
+                id="time"
+                min={1}
+                defaultValue={1}
+              ></input>
+              <hr></hr>
+
               <select name="repetition" id="repetition">
                 <option value="no-rep">No se repite</option>
                 <option value="diario">Se repite cada día</option>
@@ -187,14 +316,14 @@ export default function Main() {
         ))
       : (form = (
           <>
-            <h2 className="popup__title">{"Bloque de estudio - " + name}</h2>
+            <h2 className="popup__title">{`Bloque de ${isToggled ? "estudio" : "clase"} - ` + name}</h2>
             <Form method="post">
               <input type="hidden" name="id" value={editingId} />
-              <label htmlFor="name">Nombre del bloque:</label>
+              <label htmlFor="blockName">Nombre del bloque:</label>
               <input
                 type="text"
-                id="name"
-                name="name"
+                id="blockName"
+                name="blockName"
                 placeholder={name}
               ></input>
               <br></br>
@@ -202,7 +331,7 @@ export default function Main() {
               <input
                 id="subjectName"
                 name="subjectName"
-                value={subject}
+                defaultValue={subject}
                 readOnly
               ></input>
               <br></br>
@@ -212,7 +341,7 @@ export default function Main() {
                 name="time"
                 id="time"
                 min={1}
-                defaultValue={1}
+                defaultValue={time}
               ></input>
               <br></br>
               <select name="repetition" id="repetition">
@@ -220,6 +349,9 @@ export default function Main() {
                 <option value="diario">Se repite cada día</option>
                 <option value="semanal">Se repite cada semana</option>
               </select>
+              <br></br>
+              <label htmlFor="completed">Completado: </label>
+              <input type="checkbox" name="completed" id="completed"></input>
               <br></br>
               <input
                 type="submit"
@@ -252,13 +384,13 @@ export default function Main() {
         <nav id="full-navigation">
           <ul className="navigation">
             <li className="nav-item">
-              <NavLink to={"/pomodoro"} className={"link"}>
-                Empezar pomodoro
+              <NavLink to={"/pomodoro"} >
+                <button className={"link"}>Empezar pomodoro</button>
               </NavLink>
             </li>
             <li className="nav-item">
-              <NavLink to={"/studyMode"} className={"link"}>
-                Modo estudio
+              <NavLink to={"/studyMode"} >
+                <button className={"link"}>Modo estudio</button>
               </NavLink>
             </li>
             <li className="nav-item">
@@ -272,49 +404,115 @@ export default function Main() {
               </button>
             </li>
             <li className="nav-item">
-              <NavLink to={"/configurationForm"} className={"link"}>
-                Configuración
+              <NavLink to={"/configurationForm"} >
+                <button className={"link"}>Configuración</button>
               </NavLink>
             </li>
           </ul>
         </nav>
       </header>
       <main>
-        <div className="grid-container">
-          <div className="grid-item" key={0}></div>
+        <div className="calendar">
+          <div className="calendar__corner" key={0}></div>
           {daysOfWeek.map((day, index) => (
-            <div className="grid-item" key={index + 1}>
-              <p>{day}</p>
+            <div className={`calendar__day ${index + 1 == 7 ? "final-day" : ""}`} key={index + 1}>
+              {day}
             </div>
           ))}
           {Array.from({ length: 192 }, (_, index) =>
             index % 8 == 0 ? (
-              <div className="grid-item" key={index + 24}>
+              <div className={`calendar__hour ${index + 24 == 208 ? "final-hour" : ""}`} key={index + 24}>
                 <p>{numbers[index / 8]}:00</p>
               </div>
             ) : (
               <div
-                className="grid-block"
+                className={`calendar__grid ${index + 24 == 215 ? "final-grid" : ""}`}
                 key={index + 24}
                 onClick={() => handleGridBlockClick(index + 24)}
-              >
-                {studyBlocks.map(
-                  (studyBlock: { blockId: number; name: string }) =>
-                    // eslint-disable-next-line react/jsx-key
-                    studyBlock.blockId == index + 24 ? (
-                      <div
-                        className="block"
-                        onClick={(e) => handleBlockClick(index + 24, e)}
-                      >
-                        {studyBlock.name}
-                      </div>
-                    ) : (
-                      selectedValues[index + 24]
-                    )
-                )}
-              </div>
+              ></div>
             )
           )}
+
+          {studyBlocks?.map(
+            (
+              studyBlock: { blockId: number; time: number; name: string },
+              i: number
+            ) => {
+              const dayIndex = studyBlock.blockId % 8;
+              const startHour = (studyBlock.blockId - dayIndex - 24) / 8;
+              return (
+                <div
+                  key={i}
+                  className="class-item"
+                  style={{
+                    top: `calc(3dvh + 3.4dvh * ${startHour})`,
+                    height: `calc(${studyBlock.time} * 3.4dvh)`,
+                    lineHeight: `calc(${studyBlock.time} * 1.7dvh)`,
+                    left: `calc(13dvw * (${dayIndex - 1}) + 3dvw)`,
+                    position: "absolute",
+                  }}
+                  title={studyBlock.name}
+                  onClick={(e) => handleBlockClick(studyBlock.blockId, e, true)}
+                >
+                  {studyBlock.name}
+                </div>
+              );
+            }
+          )}
+
+          {classBlocks?.map(
+            (
+              classBlock: { blockId: number; time: number; name: string },
+              i: number
+            ) => {
+              const dayIndex = classBlock.blockId % 8;
+              const startHour = (classBlock.blockId - dayIndex - 24) / 8;
+              return (
+                <div
+                  key={i}
+                  className="class-item"
+                  style={{
+                    top: `calc(3dvh + 3.4dvh * ${startHour})`,
+                    height: `calc(${classBlock.time} * 3.4dvh)`,
+                    lineHeight: `calc(${classBlock.time} * 1.7dvh)`,
+                    left: `calc(13dvw * (${dayIndex - 1}) + 3dvw)`,
+                    position: "absolute",
+                  }}
+                  title={classBlock.name}
+                  onClick={(e) => handleBlockClick(classBlock.blockId, e, false)}
+                >
+                  {classBlock.name}
+                </div>
+              );
+            }
+          )}
+
+          {events?.map((event: { date: Date; name: string }, i: number) => {
+            const { hours, dayOfWeek } = getDateValues(event.date);
+            const hour = 8 * (3 + hours);
+            const blockId = hour + dayOfWeek;
+            const dayIndex = blockId % 8;
+            const startHour = (blockId - dayIndex - 24) / 8;
+            return (
+              <div
+                key={i}
+                className="class-item"
+                style={{
+                  top: `calc(3dvh + 3.4dvh * ${startHour})`,
+                  /* height: `calc(${event.time} * 3.4dvh)`,
+                  lineHeight: `calc(${event.time} * 1.7dvh)`, */
+                  left: `calc(13dvw * (${dayIndex - 1}) + 3dvw)`,
+                  position: "absolute",
+                  width: "13dvw",
+                  backgroundColor: "gray",
+                }}
+                title={event.name}
+                onClick={(e) => handleEventClick(blockId, e)}
+              >
+                {event.name}
+              </div>
+            );
+          })}
         </div>
 
         <div id="popup" className={`popup-show--${editingBlock}`}>
@@ -422,13 +620,21 @@ export async function action({ request }: ActionFunctionArgs) {
       date: "",
       notes: "",
       subjectName: "",
+      blockId: "",
     };
 
-    event.name = formData.get("name")?.toString();
-    event.color = formData.get("color")?.toString();
-    event.date = formData.get("date")?.toString();
-    event.notes = formData.get("notes")?.toString();
-    event.subjectName = formData.get("subjectName")?.toString();
+    const { hours, dayOfWeek } = getDateValues(
+      formData.get("date")?.toString()
+    );
+    const hour = 8 * (3 + hours);
+    const blockId = hour + dayOfWeek;
+
+    event.name = formData.get("name")?.toString() || "";
+    event.color = formData.get("color")?.toString() || "";
+    event.date = formData.get("date")?.toString() || "";
+    event.notes = formData.get("notes")?.toString() || "";
+    event.subjectName = formData.get("subjectName")?.toString() || "";
+    event.blockId = blockId.toString();
 
     addEvent(event);
   } else {
@@ -441,11 +647,11 @@ export async function action({ request }: ActionFunctionArgs) {
         repetition: "",
       };
 
-      studyBlock.blockId = formData.get("id")?.toString();
-      studyBlock.name = formData.get("name")?.toString();
-      studyBlock.subjectName = formData.get("subjectName")?.toString();
-      studyBlock.time = formData.get("time")?.toString();
-      studyBlock.repetition = formData.get("repetition")?.toString();
+      studyBlock.blockId = formData.get("id")?.toString() || "";
+      studyBlock.name = formData.get("blockName")?.toString() || "";
+      studyBlock.subjectName = formData.get("subjectName")?.toString() || "";
+      studyBlock.time = formData.get("time")?.toString() || "";
+      studyBlock.repetition = formData.get("repetition")?.toString() || "";
 
       addStudyBlock(studyBlock);
     } else {
@@ -454,13 +660,14 @@ export async function action({ request }: ActionFunctionArgs) {
         name: "",
         subjectName: "",
         repetition: "",
+        time: "",
       };
 
-      classBlock.blockId = formData.get("id")?.toString();
-      classBlock.name = formData.get("name")?.toString();
-      classBlock.subjectName = formData.get("subjectName")?.toString();
-      classBlock.time = formData.get("time")?.toString();
-      classBlock.repetition = formData.get("repetition")?.toString();
+      classBlock.blockId = formData.get("id")?.toString() || "";
+      classBlock.name = formData.get("blockName")?.toString() || "";
+      classBlock.subjectName = formData.get("subjectName")?.toString() || "";
+      classBlock.time = formData.get("time")?.toString() || "";
+      classBlock.repetition = formData.get("repetition")?.toString() || "";
 
       addClassBlock(classBlock);
     }

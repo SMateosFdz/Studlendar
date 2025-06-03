@@ -4,32 +4,49 @@ import Navigation from "~/components/Navigation";
 import pomodoroStyles from "~/styles/pomodoro.css";
 import navStyles from "~/styles/navigation.css";
 
+
+type TimerMode = "pomodoro" | "shortBreak" | "longBreak";
+
+const defaultDurations = {
+  pomodoro: 25 * 60,
+  shortBreak: 5 * 60,
+  longBreak: 15 * 60,
+};
+
 export default function Pomodoro() {
-  const [pomodoroLength, setPomodoroLength] = useState(25); // minutes
-  const [pauseLength, setPauseLength] = useState(5); // minutes
-  const [timeLeft, setTimeLeft] = useState(pomodoroLength * 60); // seconds
+  const [durations, setDurations] = useState({
+    pomodoro: defaultDurations.pomodoro,
+    shortBreak: defaultDurations.shortBreak,
+    longBreak: defaultDurations.longBreak,
+  });
+
+  const [mode, setMode] = useState<TimerMode>("pomodoro");
+  const [timeLeft, setTimeLeft] = useState(durations.pomodoro);
   const [isRunning, setIsRunning] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const [isPomodoroSession, setIsPomodoroSession] = useState(true);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  // Update timeLeft when lengths change and timer is not running
+
   useEffect(() => {
-    if (!isRunning) {
-      setTimeLeft((isPomodoroSession ? pomodoroLength : pauseLength) * 60);
-    }
-  }, [pomodoroLength, pauseLength, isPomodoroSession, isRunning]);
+    setTimeLeft(durations[mode]);
+    setIsRunning(false);
+  }, [mode, durations]);
+
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
-    if (isRunning && !isPaused) {
-      timerRef.current = setInterval(() => {
+    if (isRunning) {
+      intervalRef.current = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
-            // Session end, switch
-            if (isPomodoroSession) {
-              setIsPomodoroSession(false);
-              return pauseLength * 60;
+            // Timer finished
+            // If currently pomodoro, switch UI to short break paused
+            if (mode === "pomodoro") {
+              setMode("shortBreak");
+              // Do not start short break automatically
+              setIsRunning(false);
+              return durations.shortBreak;
             } else {
-              setIsPomodoroSession(true);
-              return pomodoroLength * 60;
+              // For other modes, just stop timer at 0
+              setIsRunning(false);
+              return 0;
             }
           }
           return prev - 1;
@@ -37,102 +54,143 @@ export default function Pomodoro() {
       }, 1000);
     }
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [isRunning, isPaused, isPomodoroSession, pomodoroLength, pauseLength]);
+  }, [isRunning, mode, durations.shortBreak]);
 
-  const formatTime = (seconds: number) => {
+  // Format seconds as MM:SS
+  function formatTime(seconds: number) {
     const m = Math.floor(seconds / 60)
       .toString()
       .padStart(2, "0");
     const s = (seconds % 60).toString().padStart(2, "0");
     return `${m}:${s}`;
-  };
+  }
 
-  const handleStart = () => {
-    if (timeLeft === 0) {
-      setTimeLeft((isPomodoroSession ? pomodoroLength : pauseLength) * 60);
-    }
-    setIsRunning(true);
-    setIsPaused(false);
-  };
-
-  const handlePause = () => {
-    setIsPaused(true);
-  };
-
-  const handleRestart = () => {
-    setIsRunning(false);
-    setIsPaused(false);
-    setIsPomodoroSession(true);
-    setTimeLeft(pomodoroLength * 60);
-  };
+  // Handlers for inputs change (in minutes)
+  function handleDurationChange(e: React.ChangeEvent<HTMLInputElement>, type: TimerMode) {
+    let val = parseInt(e.target.value);
+    if (isNaN(val) || val < 1) val = 1;
+    setDurations((d) => ({ ...d, [type]: val * 60 }));
+  }
 
   return (
     <>
-      <Navigation currentPage={"/pomodoro"} />
-      <main>
-        <div id="pomodoro">
-          <h1>Pomodoro</h1>
-          <label htmlFor="pomodoro-length">
-            Duración del pomodoro (minutos)
-            
-          </label>
-          <input
-              type="number"
-              id="pomodoro-length"
-              min={1}
-              max={60}
-              value={pomodoroLength}
-              onChange={(e) => {
-                const val = Math.min(60, Math.max(1, Number(e.target.value)));
-                setPomodoroLength(val);
-              }}
-              disabled={isRunning}
-              aria-label="Pomodoro length in minutes"
-            />
-          <br></br>
-          <label htmlFor="pause-length">
-            Duración de la pausa (minutos)
-          </label>
-          <input
-              type="number"
-              id="pause-length"
-              min={1}
-              max={30}
-              value={pauseLength}
-              onChange={(e) => {
-                const val = Math.min(30, Math.max(1, Number(e.target.value)));
-                setPauseLength(val);
-              }}
-              disabled={isRunning}
-              aria-label="Pause length in minutes"
-            />
-          <div className="session-type" aria-live="polite">
-            {isPomodoroSession ? "Sesión de concentración" : "Sesión de pausa"}
-          </div>
-          <div
-            className="timer-display"
-            role="timer"
-            aria-live="assertive"
-            aria-atomic="true"
+      <Navigation currentPage={"/pomodoro"}></Navigation>
+      <main className="pomodoro" role="main" aria-label="Pomodoro Timer">
+        <h1>Pomodoro Timer</h1>
+        <div className="pomodoro__mode-buttons" role="tablist" aria-label="Timer Modes">
+          <button
+            role="tab"
+            aria-selected={mode === "pomodoro"}
+            aria-controls="timer"
+            id="mode-pomodoro"
+            className={mode === "pomodoro" ? "active" : ""}
+            onClick={() => setMode("pomodoro")}
+            disabled={isRunning}
           >
-            {formatTime(timeLeft)}
-          </div>
-          <div className="buttons">
-            {!isRunning || isPaused ? (
-              <button onClick={handleStart} aria-label="Start timer">
-                Empezar
-              </button>
-            ) : (
-              <button onClick={handlePause} aria-label="Pause timer">
-                Pausar
-              </button>
-            )}
-            <button onClick={handleRestart} aria-label="Restart timer">
-              Reiniciar
+            Pomodoro
+          </button>
+          <button
+            role="tab"
+            aria-selected={mode === "shortBreak"}
+            aria-controls="timer"
+            id="mode-shortBreak"
+            className={mode === "shortBreak" ? "active" : ""}
+            onClick={() => setMode("shortBreak")}
+            disabled={isRunning}
+          >
+            Pausa Corta
+          </button>
+          <button
+            role="tab"
+            aria-selected={mode === "longBreak"}
+            aria-controls="timer"
+            id="mode-longBreak"
+            className={mode === "longBreak" ? "active" : ""}
+            onClick={() => setMode("longBreak")}
+            disabled={isRunning}
+          >
+            Pausa larga
+          </button>
+        </div>
+        <div
+          id="timer"
+          role="timer"
+          aria-live="polite"
+          className="pomodoro__timer-display"
+          aria-label={`Time left in ${mode === "pomodoro" ? "Pomodoro" : mode === "shortBreak" ? "Short Break" : "Long Break"} mode`}
+        >
+          {formatTime(timeLeft)}
+        </div>
+        <div className="pomodoro__controls">
+          {isRunning ? (
+            <button onClick={() => setIsRunning(false)} aria-label="Pause Timer">
+              Pausar
             </button>
-          </div>
+          ) : (
+            <button
+              onClick={() => {
+                if (timeLeft === 0) {
+                  setTimeLeft(durations[mode]);
+                }
+                setIsRunning(true);
+              }}
+              aria-label="Start Timer"
+              disabled={timeLeft === 0}
+            >
+              Empezar
+            </button>
+          )}
+          <button
+            onClick={() => {
+              setIsRunning(false);
+              setTimeLeft(durations[mode]);
+            }}
+            aria-label="Reset Timer"
+          >
+            Reiniciar
+          </button>
+        </div>
+        <div className="pomodoro__duration-inputs" aria-label="Set durations in minutes">
+          <label htmlFor="pomodoro-duration">
+            Pomodoro (min):
+            <input
+              id="pomodoro-duration"
+              type="number"
+              min={1}
+              value={Math.floor(durations.pomodoro / 60)}
+              onChange={(e) => handleDurationChange(e, "pomodoro")}
+              disabled={isRunning}
+              aria-describedby="pomodoro-desc"
+            />
+          </label>
+          <br></br>
+          <label htmlFor="shortBreak-duration">
+            Pausa corta (min):
+            <input
+              id="shortBreak-duration"
+              type="number"
+              min={1}
+              value={Math.floor(durations.shortBreak / 60)}
+              onChange={(e) => handleDurationChange(e, "shortBreak")}
+              disabled={isRunning}
+              aria-describedby="shortBreak-desc"
+            />
+          </label>
+          <br></br>
+          <label htmlFor="longBreak-duration">
+            Pausa larga (min):
+            <input
+              id="longBreak-duration"
+              type="number"
+              min={1}
+              value={Math.floor(durations.longBreak / 60)}
+              onChange={(e) => handleDurationChange(e, "longBreak")}
+              disabled={isRunning}
+              aria-describedby="longBreak-desc"
+            />
+          </label>
         </div>
       </main>
     </>

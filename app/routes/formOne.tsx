@@ -1,6 +1,7 @@
 import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Form, redirect } from "@remix-run/react";
-import { getStoredSubjects } from "~/data/subjects";
+import { userId } from "~/cookies.server";
+import { prisma } from "~/data/database.server";
 import styles from "~/styles/formOne.css";
 
 export const meta: MetaFunction = () => {
@@ -61,11 +62,13 @@ export default function FormOne() {
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const intent = formData.get("move");
-  const existingSubjects = await getStoredSubjects();
-  const number = existingSubjects.length;
+  const cookie = await userId.parse(request.headers.get("Cookie"));
+  const existingSubjects = await prisma.subject.findMany({
+    where: { authorId: cookie.userId },
+  });
 
   if (intent === "Guardar e ir al siguiente paso") {
-    if (number !== 0) {
+    if (existingSubjects.length !== 0) {
       return redirect("/configurationForm");
     }
   }

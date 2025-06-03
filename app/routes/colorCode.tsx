@@ -2,7 +2,7 @@ import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form, Link } from "@remix-run/react";
 
-import styles from "~/styles/createSubject.css";
+import styles from "~/styles/colorCode.css";
 
 export const meta: MetaFunction = () => {
   return [{ title: "Studlendar" }];
@@ -11,15 +11,24 @@ export const meta: MetaFunction = () => {
 export default function ColorCode() {
   return (
     <>
-      <h1>Bienvenido a Studlendar</h1>
-      <h2>Código de colores</h2>
+      <header>
+        <h1>Bienvenido a Studlendar</h1>
+      </header>
+      <main>
+        <h2>Código de colores</h2>
       <Form method="post" id="colorForm">
-        <label>Color bloque clase:</label>
+        <label>Color de bloques de clase:</label>
+        <input type="color" />
+        <hr></hr>
+        <label>Color de bloques de estudio:</label>
         <input type="color" />
         <hr></hr>
         <input type="submit" name="return" value="Guardar y volver"></input>
       </Form>
-      <Link to={"/configurationForm"}>Cancelar</Link>
+      </main>
+      <footer>
+        <Link to={"/configurationForm"}>Cancelar</Link>
+      </footer>
     </>
   );
 }

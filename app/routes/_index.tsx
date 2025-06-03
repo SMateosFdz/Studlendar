@@ -10,7 +10,7 @@ export default function Index() {
   const data: any = useActionData();
 
   return (
-    <>
+    <div>
       <header>
         <h1>Bienvenido a Studlendar</h1>
       </header>
@@ -36,7 +36,7 @@ export default function Index() {
         <h3>¿No tienes cuenta?</h3>
         <Link to="/newAccount">Crea una nueva cuenta</Link>
       </footer>
-    </>
+    </div>
   );
 }
 
