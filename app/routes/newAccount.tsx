@@ -24,7 +24,7 @@ export default function NewAccount() {
 
       {data?.message && <p>{data.message}</p>}
 
-      <Link to={"/formOne"}>Regresar a inicio</Link>
+      <Link to={"/"}>Regresar a inicio</Link>
     </>
   );
 }
@@ -50,7 +50,7 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   await addUser(userData);
-  return redirect("/");
+  return redirect("/formOne");
 }
 
 export function links() {
