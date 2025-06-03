@@ -1,13 +1,31 @@
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import Navigation from "~/components/Navigation";
-import { getStoredStudyBlocks } from "~/data/studyBlocks";
+import { userId } from "~/cookies.server";
+import { prisma } from "~/data/database.server";
 import navStyles from "~/styles/navigation.css";
 import styles from "~/styles/studyMode.css";
 import { getCurrentDate } from "~/utils/date";
 
 
-export async function loader() {
-  const existingStudyBlocks = await getStoredStudyBlocks();
+export async function loader({ request }: LoaderFunctionArgs) {
+  const cookie = await userId.parse(request.headers.get("Cookie"));
+  const existingSubjects = await prisma.subject.findMany({
+    where: { authorId: cookie.userId },
+  });
+
+  const existingStudyBlocks = [];
+
+  const studyBlocks = existingSubjects.map(async (subject) => {
+    const studyBlocks = await prisma.studyBlock.findMany({
+      where: { subjectName: subject.name },
+    });
+    return studyBlocks;
+  });
+
+  const allStudyBlocks = await Promise.all(studyBlocks);
+
+  existingStudyBlocks.push(...allStudyBlocks.flat());
 
   return existingStudyBlocks;
 }
@@ -19,10 +37,10 @@ export function Calculate(blocks, hours: number, day: number){
         ids.push(i + day - 1);
     }
 
-    const id = ids[hours];   
+    const id = ids[hours];
 
-    blocks.map((block: {id: number}) => {
-        if(block.id == id){
+    blocks.map((block: {blockId: number}) => {
+        if(block.blockId == id){
             flag = true;
         }
     })
@@ -38,9 +56,9 @@ export default function Pomodoro() {
     <>
       <Navigation currentPage={"/study-mode"} />
       <main>
-          <h1>Modo estudio</h1>
-          <div>
-            {Calculate(studyBlocks, hours, dayOfWeek) ? "hay bloque en esta hora" : "no hay bloque en esta hora"}
+          <h1 className="studyMode__title">Modo estudio</h1>
+          <div className="studyMode__container">
+            {Calculate(studyBlocks, hours, dayOfWeek) ? "Hay bloque en esta hora" : "No hay bloque en esta hora"}
           </div>
       </main>
     </>
