@@ -7,6 +7,8 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { userId } from "~/cookies.server";
 import { prisma } from "~/data/database.server";
 import { addStudyBlock } from "~/data/studyBlocks.server";
+import { getDaysOfWeek } from "~/utils/date";
+import { StudyBlock } from "~/interfaces/studyblock";
 
 export function showSubjectProposals(subject: any) {
   const pool = Array.from({ length: 193 }, (_, i) => i);
@@ -60,14 +62,6 @@ export async function loader({request}: LoaderFunctionArgs) {
 interface Proposal {
   id: string;
   proposals: number[];
-}
-
-interface StudyBlock {
-  name: string;
-  subjectName: string;
-  time: string;
-  repetition: string;
-  blockId: string;
 }
 
 export default function Proposals() {
@@ -129,27 +123,45 @@ export default function Proposals() {
         >
           Abrir listado de propuestas
         </button>
-        <div className="grid-container">
-          <div className="grid-item" key={0}></div>
+
+        <div className="calendar">
+          <div className="calendar__corner" key={0}></div>
           {daysOfWeek.map((day, index) => (
-            <div className="grid-item" key={index + 1}>
+            <div className={`calendar__day ${index + 1 == 7 ? "final-day" : ""}`} key={index + 1}>
               {day}
             </div>
           ))}
           {Array.from({ length: 192 }, (_, index) =>
             index % 8 == 0 ? (
-              <div className="grid-item" key={index + 24}>
-                {numbers[index / 8]}:00
+              <div className={`calendar__hour ${index + 24 == 208 ? "final-hour" : ""}`} key={index + 24}>
+                <p>{numbers[index / 8]}:00</p>
               </div>
             ) : (
-              <div className="grid-block" key={index + 24}>
+              <div
+                className={`calendar__grid ${index + 24 == 215 ? "final-grid" : ""}`}
+                key={index + 24}
+                // onClick={() => handleGridBlockClick(index + 24)}
+              >
                 {selectedValues.map((value: any) =>
                   value.proposals.map((proposal: number, ind: number) =>
                     proposal === index + 24
                       ? isChecked.map((obj) =>
                           obj.id == value.id + ind ? (
-                            obj.checked === true ? (
-                              <p>{value.id}</p>
+                            obj.checked === true ? 
+                              (
+                              <div
+                  className="class-item"
+                  style={{
+                    top: `calc(3dvh + 3.4dvh * ${value.id})`,
+                    /* height: `calc(${studyBlock.time} * 3.4dvh)`,
+                    lineHeight: `calc(${studyBlock.time} * 1.7dvh)`, */
+                    left: `calc(13dvw * (${value.id - value.id % 8 - 1}) + 3dvw)`,
+                    position: "absolute",
+                  }}
+                  title={value.id}
+                >
+                  {value.id}
+                </div>
                             ) : (
                               ""
                             )
@@ -204,6 +216,11 @@ export default function Proposals() {
                 name="close"
                 value="Guardar y volver a configuración"
               ></input>
+              <input
+                type="submit"
+                name="close"
+                value="Guardar e ir al calendario"
+              ></input>
             </Form>
           </div>
         </div>
@@ -219,12 +236,20 @@ export async function action({ request }: ActionFunctionArgs) {
 
   formData.forEach((element, key) => {
     if (key.split(/(\d+)/)[0] !== "close") {
+      const dayIndex = element.toString() % 8;
+      const startHour = (element.toString() - dayIndex - 24) / 8 + 2;
+      const year = new Date().getFullYear();
+      const month = new Date().getMonth();
+      const days = getDaysOfWeek();
+      
+      const date = new Date(year, month, days[dayIndex - 1], startHour);
       elements.push({
         name: key.toString(),
         subjectName: key.split(/(\d+)/)[0],
         time: "1",
         repetition: "semanal",
         blockId: element.toString(),
+        date: date.toDateString(),
       });
     }
   });
@@ -233,7 +258,11 @@ export async function action({ request }: ActionFunctionArgs) {
     addStudyBlock(element);
   })
 
-  return redirect("/configurationForm");
+  if(formData.get("close") == "Guardar y volver a configuración"){
+    return redirect("/configurationForm");
+  } else{
+    return redirect("/main");
+  }
 }
 
 export function links() {
