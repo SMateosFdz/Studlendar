@@ -11,6 +11,7 @@ export async function addClassBlock(classBlockData) {
                 connect: {name: classBlockData.subjectName},
             },
             time: classBlockData.time,
+            date: new Date(classBlockData.date),
         }});
 
         return {ok: true};

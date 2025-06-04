@@ -11,7 +11,7 @@ export async function addStudyBlock(studyBlockData) {
             subject: {
                 connect: {name: studyBlockData.subjectName},
             },
-            
+            date: new Date(studyBlockData.date),
         }});
 
         return {ok: true};
