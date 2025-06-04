@@ -41,6 +41,7 @@ model StudyBlock {
   blockId String
   name String
   time String
+  date DateTime
   repetition String
 }
 
@@ -51,6 +52,7 @@ model ClassBlock {
   blockId String
   name String
   time String
+  date DateTime
   repetition String
 }
 
