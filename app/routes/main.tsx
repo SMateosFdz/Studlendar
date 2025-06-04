@@ -1,5 +1,5 @@
 /* eslint-disable array-callback-return */
-import navStyles from "~/styles/navigation.css";
+import navStyles from "~/styles/calendarNavigation.css";
 import calendarStyles from "~/styles/calendar.css";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
@@ -10,10 +10,11 @@ import { prisma } from "~/data/database.server";
 import { addStudyBlock } from "~/data/studyBlocks.server";
 import { addClassBlock } from "~/data/classBlocks.server";
 import { addEvent } from "~/data/events.server";
+import { filterDates } from "~/utils/filterDates";
 import type { StudyBlock } from "~/interfaces/studyblock";
 import type { ClassBlock } from "~/interfaces/classblock";
 import type { Event } from "~/interfaces/event";
-import { getDateValues } from "~/utils/date";
+import { getDateValues, getDaysOfWeek } from "~/utils/date";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const cookie = await userId.parse(request.headers.get("Cookie"));
@@ -21,9 +22,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
     where: { authorId: cookie.userId },
   });
 
-  const existingStudyBlocks = [];
-  const existingEvents = [];
-  const existingClassBlocks = [];
+  let existingStudyBlocks = [];
+  let existingEvents = [];
+  let existingClassBlocks = [];
 
   const studyBlocks = existingSubjects.map(async (subject) => {
     const studyBlocks = await prisma.studyBlock.findMany({
@@ -54,6 +55,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
   existingEvents.push(...allEvents.flat());
   existingClassBlocks.push(...allClassBlocks.flat());
 
+  existingStudyBlocks = filterDates(existingStudyBlocks);
+  existingEvents = filterDates(existingEvents);
+  existingClassBlocks = filterDates(existingClassBlocks);
+
   const response = {
     subjects: existingSubjects,
     studyBlocks: existingStudyBlocks,
@@ -76,6 +81,7 @@ export default function Main() {
   const [isToggled, setIsToggled] = useState(false);
   const [editingId, setEditingId] = useState(0);
   const [currentSelection, setCurrentSelection] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   function handleBlockClick(blockId: any, e: MouseEvent, toggled: boolean) {
     e.stopPropagation();
@@ -295,6 +301,7 @@ export default function Main() {
                 name="time"
                 id="time"
                 min={1}
+                step={0.5}
                 defaultValue={1}
               ></input>
               <hr></hr>
@@ -341,6 +348,7 @@ export default function Main() {
                 name="time"
                 id="time"
                 min={1}
+                step={0.5}
                 defaultValue={time}
               ></input>
               <br></br>
@@ -381,8 +389,17 @@ export default function Main() {
     <>
       <header>
         <h1 id="title">Studlendar</h1>
-        <nav id="full-navigation">
-          <ul className="navigation">
+        <nav id={`full-navigation`}>
+          <button
+            className="full-navigation__button"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            <img 
+              src={!menuOpen ? ` https://img.icons8.com/ios/50/menu--v4.png` : `https://img.icons8.com/ios/50/delete-sign--v3.png`}
+              alt={!menuOpen ? "menu--v4" : "delete-sign--v3"}
+            />
+          </button>
+          {menuOpen && (<ul className="navigation">
             <li className="nav-item">
               <NavLink to={"/pomodoro"} >
                 <button className={"link"}>Empezar pomodoro</button>
@@ -408,7 +425,7 @@ export default function Main() {
                 <button className={"link"}>Configuración</button>
               </NavLink>
             </li>
-          </ul>
+          </ul>)}
         </nav>
       </header>
       <main>
@@ -546,7 +563,7 @@ export default function Main() {
               </select>
               <hr></hr>
               <label htmlFor="hours">Horas de estudio: </label>
-              <input name="hours" id="hours" type="number"></input>
+              <input name="hours" id="hours" type="number" step={0.5} min={1}></input>
               <hr></hr>
               <input
                 type="submit"
@@ -645,6 +662,7 @@ export async function action({ request }: ActionFunctionArgs) {
         subjectName: "",
         time: "",
         repetition: "",
+        date: "",
       };
 
       studyBlock.blockId = formData.get("id")?.toString() || "";
@@ -652,6 +670,15 @@ export async function action({ request }: ActionFunctionArgs) {
       studyBlock.subjectName = formData.get("subjectName")?.toString() || "";
       studyBlock.time = formData.get("time")?.toString() || "";
       studyBlock.repetition = formData.get("repetition")?.toString() || "";
+
+      const dayIndex = studyBlock.blockId % 8;
+      const startHour = (studyBlock.blockId - dayIndex - 24) / 8 + 2;
+      const year = new Date().getFullYear();
+      const month = new Date().getMonth();
+      const days = getDaysOfWeek();
+
+      const date = new Date(year, month, days[dayIndex - 1], startHour);
+      studyBlock.date = date.toDateString();
 
       addStudyBlock(studyBlock);
     } else {
@@ -661,6 +688,7 @@ export async function action({ request }: ActionFunctionArgs) {
         subjectName: "",
         repetition: "",
         time: "",
+        date: "",
       };
 
       classBlock.blockId = formData.get("id")?.toString() || "";
@@ -668,6 +696,15 @@ export async function action({ request }: ActionFunctionArgs) {
       classBlock.subjectName = formData.get("subjectName")?.toString() || "";
       classBlock.time = formData.get("time")?.toString() || "";
       classBlock.repetition = formData.get("repetition")?.toString() || "";
+
+      const dayIndex = classBlock.blockId % 8;
+      const startHour = (classBlock.blockId - dayIndex - 24) / 8 + 2;
+      const year = new Date().getFullYear();
+      const month = new Date().getMonth();
+      const days = getDaysOfWeek();
+
+      const date = new Date(year, month, days[dayIndex - 1], startHour);
+      classBlock.date = date.toDateString();
 
       addClassBlock(classBlock);
     }
