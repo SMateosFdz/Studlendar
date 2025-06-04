@@ -1,25 +1,21 @@
-/* header {
+header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-} */
-
-header{
-  margin-bottom: 20px;
 }
 
 #full-navigation {
   /* margin-top: 20px; */
   text-align: center;
-  width: 100dvw;
+  width: 100%;
   animation: slideIn 2s;
-  /* display: flex;
+  display: flex;
   flex-direction: row-reverse;
   margin-right: 3dvw;
-  align-items: center; */
+  align-items: center;
 }
 
-/* .full-navigation__button{
+.full-navigation__button{
   height: 4dvh;
   display: flex;
   align-items: center;
@@ -36,7 +32,7 @@ header{
 .full-navigation__button img{
   height: 4dvh;
   color: #023e8a;
-} */
+}
 
 .navigation {
   display: flex;
