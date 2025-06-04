@@ -1,42 +1,12 @@
-/* header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-} */
-
 header{
   margin-bottom: 20px;
 }
 
 #full-navigation {
-  /* margin-top: 20px; */
   text-align: center;
   width: 100dvw;
   animation: slideIn 2s;
-  /* display: flex;
-  flex-direction: row-reverse;
-  margin-right: 3dvw;
-  align-items: center; */
 }
-
-/* .full-navigation__button{
-  height: 4dvh;
-  display: flex;
-  align-items: center;
-  border-radius: 10px;
-  background-color: white;
-  border: 1px solid #023e8a;
-}
-
-.full-navigation__button:hover{
-  background-color: #023e8a;
-  cursor: pointer;
-}
-
-.full-navigation__button img{
-  height: 4dvh;
-  color: #023e8a;
-} */
 
 .navigation {
   display: flex;

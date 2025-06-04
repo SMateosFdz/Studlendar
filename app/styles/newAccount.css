@@ -1,22 +1,25 @@
 :root{
-    background-color: rgb(220, 226, 253);
+    background-color: #caf0f8;
     text-align: center;
 }
 
 h1{
     text-align: center;
-    color: rgb(4, 0, 250);
+    color: #023E8A;
+    animation: slideIn 2s;
 }
 
 h2{
     text-align: center;
+    animation: slideIn 2.5s;
 }
 
 #sessionForm{
     width: fit-content;
     border-radius: 10px;
-    background-color: rgb(114, 124, 255);
+    background-color: #023E8A;
     margin: auto;
+    animation: slideIn 3s;
 }
 
 form{
@@ -36,7 +39,7 @@ form label{
 }
 
 button, a{
-    background-color: rgb(114, 124, 255);
+    background-color: #023E8A;
     border: 1px solid black;
     color: white;
     border-radius: 10px;
@@ -50,12 +53,26 @@ a, a:hover{
     margin: 20px;
 }
 
+a{
+    animation: slideIn 3s;
+}
+
 button:hover, a:hover{
     background-color: white;
     border: 1px solid black;
-    color: rgb(114, 124, 255);
+    color: #023E8A;
     border-radius: 10px;
     padding: 5px;
-    margin: 10px auto;
     cursor: pointer;
+}
+
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
