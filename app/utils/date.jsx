@@ -33,3 +33,21 @@ export function parseDate(icsDate) {
 
   return dateString;
 }
+
+export function getDaysOfWeek(){
+  const date = new Date();
+  const dayOfWeek = date.getDay() - 1;
+  const startOfWeek = new Date(date);
+  startOfWeek.setDate(date.getDate() - dayOfWeek);
+  const monthNumbers = [];
+
+  for (let i = 0; i < 7; i++) {
+    const currentDay = new Date(startOfWeek);
+    currentDay.setDate(startOfWeek.getDate() + i);
+    const monthNumber = currentDay.getDate();
+    monthNumbers.push(monthNumber);
+  }
+    
+  return monthNumbers;
+
+}
