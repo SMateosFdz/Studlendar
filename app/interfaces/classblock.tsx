@@ -4,4 +4,5 @@ export interface ClassBlock {
   subjectName: string;
   repetition: string;
   time: string;
+  date: string;
 }

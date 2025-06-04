@@ -4,4 +4,5 @@ export interface StudyBlock {
   subjectName: string;
   time: string;
   repetition: string;
+  date: string;
 }
