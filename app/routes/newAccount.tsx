@@ -15,6 +15,8 @@ export default function NewAccount() {
       <Form method="post" id="sessionForm">
         <label htmlFor="nameUser">Nombre:</label>
         <input type="text" name="nameUser" id="nameUser"></input>
+        <label htmlFor="email">Correo electrónico:</label>
+        <input type="email" name="email" id="email"></input>
         <label htmlFor="password">Contraseña:</label>
         <input type="password" name="password" id="password"></input>
         <label htmlFor="password2">Repetir la contraseña:</label>
@@ -46,6 +48,12 @@ export async function action({ request }: ActionFunctionArgs) {
   for(var nameComprobation of allUser){
     if(userData.nameUser === nameComprobation.nameUser){
       return { message: "Este nombre ya existe. Escoja otro." };
+    }
+  }
+
+  for(var emailComp of allUser){
+    if(userData.email === emailComp.email){
+      return {message: "Este correo ya se ha usado. Use otro."};
     }
   }
 
