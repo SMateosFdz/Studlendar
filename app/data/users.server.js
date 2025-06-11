@@ -4,6 +4,7 @@ export async function addUser(userData) {
     try {
         await prisma.user.create({data: {
             nameUser: userData.nameUser,
+            email: userData.email,
             password: userData.password,
         }});
 
