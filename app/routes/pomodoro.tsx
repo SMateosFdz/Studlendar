@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import Navigation from "~/components/Navigation";
 
 import pomodoroStyles from "~/styles/pomodoro.css";
 import navStyles from "~/styles/navigation.css";
@@ -75,10 +74,8 @@ export default function Pomodoro() {
   }
 
   return (
-    <>
-      <Navigation currentPage={"/pomodoro"}></Navigation>
-      <main className="pomodoro" role="main" aria-label="Pomodoro Timer">
-        <h1>Pomodoro Timer</h1>
+    <div className="pomodoro">
+        <h3>Pomodoro</h3>
         <div className="pomodoro__mode-buttons" role="tablist" aria-label="Timer Modes">
           <button
             role="tab"
@@ -192,8 +189,7 @@ export default function Pomodoro() {
             />
           </label>
         </div>
-      </main>
-    </>
+    </div>
   );
 }
 
