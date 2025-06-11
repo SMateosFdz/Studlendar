@@ -9,6 +9,10 @@ export function getCurrentDate() {
 }
 
 export function getDateValues(date){
+  if(date.slice(-1) === "Z"){
+    date = date.substring(0, date.length - 1);
+    date = date + "-02:00";
+  }
   const currentDate = new Date(date);
   const month = currentDate.getMonth() + 1;
   const hours = currentDate.getHours();
@@ -34,9 +38,9 @@ export function parseDate(icsDate) {
   return dateString;
 }
 
-export function getDaysOfWeek(){
-  const date = new Date();
-  const dayOfWeek = date.getDay() - 1;
+export function getDaysOfWeek(currentDate){
+  const date = new Date(currentDate);
+  const dayOfWeek = (date.getDay() + 6) % 7;
   const startOfWeek = new Date(date);
   startOfWeek.setDate(date.getDate() - dayOfWeek);
   const monthNumbers = [];
@@ -49,5 +53,4 @@ export function getDaysOfWeek(){
   }
     
   return monthNumbers;
-
 }
