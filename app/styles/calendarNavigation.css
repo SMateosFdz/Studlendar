@@ -1,18 +1,17 @@
-header {
+/* header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
+} */
 
 #full-navigation {
-  /* margin-top: 20px; */
   text-align: center;
   width: 100%;
   animation: slideIn 2s;
   display: flex;
   flex-direction: row-reverse;
-  margin-right: 3dvw;
   align-items: center;
+  margin-bottom: 20px;
 }
 
 .full-navigation__button{
@@ -44,7 +43,8 @@ header {
   margin: 0;
 }
 
-.nav-item a button{
+.nav-item a button, .nav-item button{
+  color: #023e8a;
   border-radius: 10px;
   background-color: white;
   border: 2px solid #023e8a;
@@ -58,11 +58,28 @@ header {
   height: 4dvh;
 }
 
+.nav-item select{
+  border-radius: 10px;
+  border: 2px solid #023e8a;
+  color: #023e8a;
+  font-size: 0.9vw;
+  height: 4dvh;
+}
+
+.nav-item select:hover, .nav-item select:focus{
+  background-color: #023e8a;
+  color: white;
+}
+
+.nav-item select:hover > option:hover{
+  background-color: white;
+  color: #023e8a;
+}
+
 .nav-item > .link {
   color: #023e8a;
   text-decoration: none;
   margin: 20px;
-  color: #023e8a;
   border: 2px solid #023e8a;
   padding: 5px;
   border-radius: 10px;
@@ -70,6 +87,15 @@ header {
   overflow: hidden;
   white-space: nowrap;
   background-color: white;
+}
+
+.nav-item svg{
+  margin-left: 5px;
+}
+
+.nav-item svg, .nav-item span{
+  vertical-align: middle;
+  display: inline-block;
 }
 
 .nav-item a button:hover, .nav-item button:hover {
@@ -82,8 +108,12 @@ header {
 #subtitle {
   color: #023e8a;
   text-align: center;
-  margin-left: 20px;
+  margin: 10px;
   animation: slideIn 2s;
+}
+
+#title svg{
+  margin: auto 10px;
 }
 
 @keyframes slideIn {

@@ -46,6 +46,15 @@ header{
   background-color: white;
 }
 
+.nav-item svg{
+  margin-left: 5px;
+}
+
+.nav-item svg, .nav-item span{
+  vertical-align: middle;
+  display: inline-block;
+}
+
 .nav-item a button:hover, .nav-item button:hover {
   background-color: #023e8a;
   color: white;

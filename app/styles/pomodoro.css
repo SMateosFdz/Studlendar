@@ -3,13 +3,13 @@
     border: 1px solid #023E8A;
     text-align: center;
     width: fit-content;
-    margin: auto;
+    margin: 30px auto;
     border-radius: 10px;
     padding: 20px;
     animation: slideIn 2s;
 }
 
-.pomodoro h1{
+.pomodoro h3{
     color: #03045E;
     background-color: #CAF0F8;
     border-radius: 10px;
@@ -42,8 +42,7 @@
 }
 
 .pomodoro__duration-inputs{
-    margin: 30px auto 0px;
-    background-color: #CAF0F8;
+    margin: 30px;
     border-radius: 10px;
 }
 
@@ -64,7 +63,7 @@
 @keyframes slideIn {
   0% {
     opacity: 0;
-    transform: translateY(-100%);
+    transform: translateY(-10%);
   }
   100% {
     opacity: 1;

@@ -29,7 +29,7 @@ h2{
     margin: 20px;
 }
 
-#colorForm input{
+#colorForm select{
     display: inline;
     float: right;
     margin: 20px;
