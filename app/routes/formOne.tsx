@@ -18,7 +18,7 @@ export default function FormOne() {
       <h2>Formulario inicial</h2>
       <div id="sessionForm">
         <Form method="post">
-          <label htmlFor="momento" id="momento">¿En qué momento del día eres más productivo?</label>
+          <label htmlFor="momento" id="momento">¿En qué momento del día prefieres los bloques de estudio?</label>
           <fieldset id="momento">
             <input type="checkbox" id="mañana"></input>
             <label htmlFor="mañana">Mañana</label>
@@ -26,16 +26,6 @@ export default function FormOne() {
             <label htmlFor="tarde">Tarde</label>
             <input type="checkbox" id="noche"></input>
             <label htmlFor="noche">Noche</label>
-          </fieldset>
-          <hr></hr>
-          <label htmlFor="curva-olvido">
-            ¿Quieres enfocar el estudio basado en la Curva del Olvido?
-          </label>
-          <fieldset id="curva-olvido">
-            <input type="radio" required value="si" name="curva-olvido"></input>
-            <label>Sí</label>
-            <input type="radio" required value="no" name="curva-olvido"></input>
-            <label>No</label>
           </fieldset>
           <hr></hr>
           <label htmlFor="pomodoro">
