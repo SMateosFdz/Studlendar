@@ -16,6 +16,7 @@ datasource db {
 model User {
   id       String    @id @default(auto()) @map("_id") @db.ObjectId
   nameUser String    @unique
+  email String @unique
   password String
   subjects  Subject[]
 }
@@ -35,18 +36,19 @@ model Subject {
 }
 
 model StudyBlock {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id          String   @id @map("_id")
   subject Subject @relation(fields: [subjectName], references: [name])
   subjectName String @unique
-  blockId String
+  blockId String @unique
   name String
   time String
   date DateTime
   repetition String
+  completed Int
 }
 
 model ClassBlock {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id          String   @id @map("_id")
   subject Subject @relation(fields: [subjectName], references: [name])
   subjectName String @unique
   blockId String
@@ -54,10 +56,11 @@ model ClassBlock {
   time String
   date DateTime
   repetition String
+  completed Int
 }
 
 model Event {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id          String   @id @map("_id")
   subject Subject @relation(fields: [subjectName], references: [name])
   subjectName String @unique
   blockId String
@@ -65,4 +68,5 @@ model Event {
   color String
   date DateTime
   notes String
+  completed Boolean
 }
