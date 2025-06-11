@@ -1,5 +1,4 @@
 /* eslint-disable array-callback-return */
-import calendarStyles from "~/styles/calendar.css";
 import proposalsStyles from "~/styles/proposals.css";
 import { Form, redirect, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
@@ -8,7 +7,7 @@ import { userId } from "~/cookies.server";
 import { prisma } from "~/data/database.server";
 import { addStudyBlock } from "~/data/studyBlocks.server";
 import { getDaysOfWeek } from "~/utils/date";
-import { StudyBlock } from "~/interfaces/studyblock";
+import type { StudyBlock } from "~/interfaces/studyblock";
 
 export function showSubjectProposals(subject: any) {
   const pool = Array.from({ length: 193 }, (_, i) => i);
@@ -86,6 +85,7 @@ export default function Proposals() {
 
   const [isVisible, setIsVisible] = useState(true);
   const [isChecked, setIsChecked] = useState(createInitialSubjects);
+  const [numberChecked, setNumberChecked] = useState(isChecked.length);
 
   const toggleVisibility = () => {
     setIsVisible((prev) => !prev);
@@ -97,6 +97,12 @@ export default function Proposals() {
         item.id === id ? { ...item, checked: !item.checked } : item
       )
     );
+  };
+
+  const handleAllCheck = () => {
+    isChecked.map((proposal) =>{
+      handleCheckboxChange(proposal.id);
+    })
   };
 
   const daysOfWeek = [
@@ -140,7 +146,6 @@ export default function Proposals() {
               <div
                 className={`calendar__grid ${index + 24 == 215 ? "final-grid" : ""}`}
                 key={index + 24}
-                // onClick={() => handleGridBlockClick(index + 24)}
               >
                 {selectedValues.map((value: any) =>
                   value.proposals.map((proposal: number, ind: number) =>
@@ -153,8 +158,6 @@ export default function Proposals() {
                   className="class-item"
                   style={{
                     top: `calc(3dvh + 3.4dvh * ${value.id})`,
-                    /* height: `calc(${studyBlock.time} * 3.4dvh)`,
-                    lineHeight: `calc(${studyBlock.time} * 1.7dvh)`, */
                     left: `calc(13dvw * (${value.id - value.id % 8 - 1}) + 3dvw)`,
                     position: "absolute",
                   }}
@@ -183,14 +186,24 @@ export default function Proposals() {
               &times;
             </span>
             <h2>Listado de propuestas</h2>
+            <p>En esta interfaz se te ofrecen una serie de propuestas respecto a las asignaturas creadas
+              (o que actualmente no tienen bloques de estudio):</p>
             <Form method="post">
               {selectedValues.map(
                 (
                   subject: { id: string; proposals: number[] },
-                  index: number
-                ) => (
+                  index: number,
+                ) => {
+                  const checkedCount = subject.proposals.reduce((count, _, idx) => { return isChecked.find((obj) => obj.id === subject.id + idx)?.checked
+                  ? count + 1 : count; }, 0);
+
+                  return(
                   <>
-                    <label htmlFor={subject.id}>{subject.id}</label>
+                    <label htmlFor={subject.id} className={`${checkedCount === 0 ? "proposal--red" : ""}`}>
+                      {`${subject.id}: 
+                      ${checkedCount}  
+                      bloque${checkedCount == 1 ? "" : "s"} 
+                      seleccionado${checkedCount == 1 ? "" : "s"} de ${subject.proposals.length}`}</label>
                     {subject.proposals.map((element, index) => (
                       // eslint-disable-next-line react/jsx-key
                       <input
@@ -207,10 +220,16 @@ export default function Proposals() {
                         }
                       ></input>
                     ))}
-                    <br></br>
-                  </>
-                )
+                    <hr></hr>
+                  </>)
+                }
               )}
+              <input
+                type="button"
+                value="Seleccionar todos"
+                onClick={handleAllCheck}
+              ></input>
+              <br></br>
               <input
                 type="submit"
                 name="close"
@@ -233,14 +252,17 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
 
   let elements: StudyBlock[] = [];
+  let subjects = [];
 
   formData.forEach((element, key) => {
     if (key.split(/(\d+)/)[0] !== "close") {
-      const dayIndex = element.toString() % 8;
-      const startHour = (element.toString() - dayIndex - 24) / 8 + 2;
+      const dayIndex = Number(element.toString()) % 8;
+      const startHour = (Number(element.toString()) - dayIndex - 24) / 8 + 2;
       const year = new Date().getFullYear();
       const month = new Date().getMonth();
       const days = getDaysOfWeek();
+
+      subjects.push(key.split(/(\d+)/)[0]);
       
       const date = new Date(year, month, days[dayIndex - 1], startHour);
       elements.push({
@@ -250,6 +272,7 @@ export async function action({ request }: ActionFunctionArgs) {
         repetition: "semanal",
         blockId: element.toString(),
         date: date.toDateString(),
+        completed: 0,
       });
     }
   });
@@ -267,7 +290,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export function links() {
   return [
-    { rel: "stylesheet", href: calendarStyles },
     { rel: "stylesheet", href: proposalsStyles },
   ];
 }
