@@ -3,46 +3,85 @@ import proposalsStyles from "~/styles/proposals.css";
 import { Form, redirect, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { userId } from "~/cookies.server";
+import { getSession } from "~/sessions.server";
 import { prisma } from "~/data/database.server";
 import { addStudyBlock } from "~/data/studyBlocks.server";
 import { getDaysOfWeek } from "~/utils/date";
 import type { StudyBlock } from "~/interfaces/studyblock";
+const ObjectId = require('mongodb').ObjectId;
 
-export function showSubjectProposals(subject: any) {
-  const pool = Array.from({ length: 193 }, (_, i) => i);
+function showSubjectProposals(subject: any, preferences) {
+  const matrix = Array.from({ length: 200 }, (_, i) => i);
+  const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+  const cols = 8;
+  const rows = 25;
   const result = [];
 
-  for (let i = 0; i < subject.sessions; i++) {
-    let random;
+  let preference, day, number;
+
+  for (let i = 0; i < subject.hours; i++) {
     do {
-      random = Math.floor(Math.random() * pool.length);
-    } while (random % 8 === 0);
-    result.push(random + 24);
+      number = Math.floor(Math.random() * Object.keys(preferences).length);
+      day = days[number];
+      preference = preferences[day];
+    } while (preference.length == 0);
+    let proposal = getRandomValueFromMatrix(matrix, cols, rows, day, preference, number + 1);
+    do {
+      proposal = getRandomValueFromMatrix(matrix, cols, rows, day, preference, number + 1);
+    } while (result.includes(proposal));
+    result.push(proposal);
   }
 
   const proposal: Proposal = {
-    id: subject.name,
+    id: subject.id,
+    name: subject.name,
     proposals: result,
   };
 
   return proposal;
 }
 
-export async function loader({request}: LoaderFunctionArgs) {
-  const cookie = await userId.parse(request.headers.get("Cookie"));
-  const existingSubjects = await prisma.subject.findMany({
-    where: { authorId: cookie.userId },
+function getRandomValueFromMatrix(matrix, cols, rows, day, preference, col) {
+  //const col = Math.floor(Math.random() * (cols - 1)) + 2; // 2-8
+
+  const rowRanges = {
+    "mañana": { start: 9, end: 15 },
+    "tarde": { start: 16, end: 20 },
+    "noche": { start: 21, end: 24 },
+  }
+
+  const selectedRange = preference[Math.floor(Math.random() * preference.length)];
+
+  const { start, end } = rowRanges[selectedRange];
+
+  const row = Math.floor(Math.random() * (end - start + 1)) + start;
+
+  const index = (row - 1) * cols + col;
+
+  return matrix[index] + 24;
+}
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const session = await getSession(request);
+
+  const user = await prisma.user.findUnique({
+    where: { nameUser: session.data.userId },
   });
+
+  const existingSubjects = await prisma.subject.findMany({
+    where: { authorId: session.data.userId },
+  });
+
+  const preferences = user?.preferences;
 
   let selectedValues: Proposal[] = [];
 
   const values = existingSubjects.map(async (subject) => {
     const studyBlocks = await prisma.studyBlock.findMany({
-      where: { subjectName: subject.name },
+      where: { subjectId: subject.id },
     });
-    if(studyBlocks.length == 0){
-      const proposal = showSubjectProposals(subject);
+    if (studyBlocks.length == 0) {
+      const proposal = showSubjectProposals(subject, preferences);
       return proposal;
     }
   });
@@ -51,7 +90,7 @@ export async function loader({request}: LoaderFunctionArgs) {
   let selected = await Promise.all(values);
   selectedValues.push(...selected.flat());
 
-  selectedValues = selectedValues.filter(function(element){
+  selectedValues = selectedValues.filter(function (element) {
     return element !== undefined;
   });
 
@@ -60,6 +99,7 @@ export async function loader({request}: LoaderFunctionArgs) {
 
 interface Proposal {
   id: string;
+  name: string;
   proposals: number[];
 }
 
@@ -69,11 +109,11 @@ export default function Proposals() {
 
   const createInitialSubjects = () => {
     let i = 0;
-    selectedValues.map((subject: { id: string; proposals: number[] }) => {
+    selectedValues.map((subject: { name: string; proposals: number[] }) => {
       i = 0;
       subject.proposals.map(() => {
         initialSubjects.push({
-          id: subject.id + i,
+          id: subject.name + i,
           checked: true,
         });
         i++;
@@ -100,7 +140,7 @@ export default function Proposals() {
   };
 
   const handleAllCheck = () => {
-    isChecked.map((proposal) =>{
+    isChecked.map((proposal) => {
       handleCheckboxChange(proposal.id);
     })
   };
@@ -151,27 +191,27 @@ export default function Proposals() {
                   value.proposals.map((proposal: number, ind: number) =>
                     proposal === index + 24
                       ? isChecked.map((obj) =>
-                          obj.id == value.id + ind ? (
-                            obj.checked === true ? 
-                              (
+                        obj.id == value.name + ind ? (
+                          obj.checked === true ?
+                            (
                               <div
-                  className="class-item"
-                  style={{
-                    top: `calc(3dvh + 3.4dvh * ${value.id})`,
-                    left: `calc(13dvw * (${value.id - value.id % 8 - 1}) + 3dvw)`,
-                    position: "absolute",
-                  }}
-                  title={value.id}
-                >
-                  {value.id}
-                </div>
+                                className="class-item"
+                                style={{
+                                  top: `calc(3dvh + 3.4dvh * ${value.name})`,
+                                  left: `calc(13dvw * (${value.name - value.name % 8 - 1}) + 3dvw)`,
+                                  position: "absolute",
+                                }}
+                                title={value.name + ind}
+                              >
+                                {value.name + ind}
+                              </div>
                             ) : (
                               ""
                             )
-                          ) : (
-                            ""
-                          )
+                        ) : (
+                          ""
                         )
+                      )
                       : ""
                   )
                 )}
@@ -191,37 +231,40 @@ export default function Proposals() {
             <Form method="post">
               {selectedValues.map(
                 (
-                  subject: { id: string; proposals: number[] },
+                  subject: { id: string; name: string; proposals: number[] },
                   index: number,
                 ) => {
-                  const checkedCount = subject.proposals.reduce((count, _, idx) => { return isChecked.find((obj) => obj.id === subject.id + idx)?.checked
-                  ? count + 1 : count; }, 0);
+                  const checkedCount = subject.proposals.reduce((count, _, idx) => {
+                    return isChecked.find((obj) => obj.id === subject.name + idx)?.checked
+                      ? count + 1 : count;
+                  }, 0);
 
-                  return(
-                  <>
-                    <label htmlFor={subject.id} className={`${checkedCount === 0 ? "proposal--red" : ""}`}>
-                      {`${subject.id}: 
+                  return (
+                    <>
+                      <input type="hidden" id={"subjectId"} name={"subjectId"} value={subject.id}></input>
+                      <label htmlFor={subject.name} className={`${checkedCount === 0 ? "proposal--red" : ""}`}>
+                        {`${subject.name}: 
                       ${checkedCount}  
                       bloque${checkedCount == 1 ? "" : "s"} 
                       seleccionado${checkedCount == 1 ? "" : "s"} de ${subject.proposals.length}`}</label>
-                    {subject.proposals.map((element, index) => (
-                      // eslint-disable-next-line react/jsx-key
-                      <input
-                        id={"" + index}
-                        type="checkbox"
-                        value={element}
-                        name={subject.id + index}
-                        checked={
-                          isChecked.find((obj) => obj.id === subject.id + index)
-                            ?.checked
-                        }
-                        onChange={() =>
-                          handleCheckboxChange(subject.id + index)
-                        }
-                      ></input>
-                    ))}
-                    <hr></hr>
-                  </>)
+                      {subject.proposals.map((element, index) => (
+                        // eslint-disable-next-line react/jsx-key
+                        <input
+                          id={"" + index}
+                          type="checkbox"
+                          value={element}
+                          name={subject.name + index}
+                          checked={
+                            isChecked.find((obj) => obj.id === subject.name + index)
+                              ?.checked
+                          }
+                          onChange={() =>
+                            handleCheckboxChange(subject.name + index)
+                          }
+                        ></input>
+                      ))}
+                      <hr></hr>
+                    </>)
                 }
               )}
               <input
@@ -252,38 +295,45 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
 
   let elements: StudyBlock[] = [];
-  let subjects = [];
+  let subjectId = "";
 
   formData.forEach((element, key) => {
     if (key.split(/(\d+)/)[0] !== "close") {
-      const dayIndex = Number(element.toString()) % 8;
-      const startHour = (Number(element.toString()) - dayIndex - 24) / 8 + 2;
-      const year = new Date().getFullYear();
-      const month = new Date().getMonth();
-      const days = getDaysOfWeek();
+      if (key === "subjectId") {
+        subjectId = element.toString();
+      } else {
+        const dayIndex = Number(element.toString()) % 8;
+        const startHour = (Number(element.toString()) - dayIndex - 24) / 8 + 2;
+        const year = new Date().getFullYear();
+        const month = new Date().getMonth();
+        const days = getDaysOfWeek(new Date());
 
-      subjects.push(key.split(/(\d+)/)[0]);
-      
-      const date = new Date(year, month, days[dayIndex - 1], startHour);
-      elements.push({
-        name: key.toString(),
-        subjectName: key.split(/(\d+)/)[0],
-        time: "1",
-        repetition: "semanal",
-        blockId: element.toString(),
-        date: date.toDateString(),
-        completed: 0,
-      });
+        const date = new Date(year, month, days[dayIndex - 1], startHour);
+
+        elements.push({
+          id: key.split(/(\d+)/)[0] + date.toISOString(),
+          name: key.toString(),
+          subjectId: subjectId,
+          time: "1",
+          repetition: "semanal",
+          blockId: element.toString(),
+          subjectName: key.split(/(\d+)/)[0],
+          date: date.toISOString().replace(".000", ""),
+          notes: "",
+          completed: 0,
+        });
+      }
     }
+
   });
 
   elements.forEach((element) => {
     addStudyBlock(element);
   })
 
-  if(formData.get("close") == "Guardar y volver a configuración"){
+  if (formData.get("close") == "Guardar y volver a configuración") {
     return redirect("/configurationForm");
-  } else{
+  } else {
     return redirect("/main");
   }
 }
