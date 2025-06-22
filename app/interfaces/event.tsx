@@ -4,6 +4,7 @@ export interface Event {
   color: string;
   date: string;
   notes: string;
+  subjectId: string;
   subjectName: string;
   blockId: string;
   completed: boolean;
