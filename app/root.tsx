@@ -1,18 +1,22 @@
-import type { LinksFunction} from "@remix-run/node";
+import type { LinksFunction } from "@remix-run/node";
 import {
+  Link,
   Links,
   LiveReload,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
+  useRouteError,
 
 } from "@remix-run/react";
 
 import appStylesHref from "~/styles/app.css";
+import errorStyles from "~/styles/error.css";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: appStylesHref },
+  { rel: "stylesheet", href: errorStyles }
 ];
 
 export default function App() {
@@ -36,3 +40,53 @@ export default function App() {
     </html>
   );
 }
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+  let contentError = (<html>
+    <head>
+      <title>Oh no!</title>
+      <Meta />
+      <Links />
+    </head>
+    <body>
+      <div>
+        <h1>
+          Studlendar
+        </h1>
+        <h2>
+          Error desconocido :&#40; <br/>
+          Vuelva al inicio de sesión.
+        </h2>
+        <Link to={"/"}>Volver al inicio de sesión.</Link>
+      </div>
+      <Scripts />
+    </body>
+  </html>);
+
+  if (error.message.includes("sesión")) {
+    contentError = (<html>
+      <head>
+        <title>Oh no!</title>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <div>
+          <h1>
+            Studlendar
+          </h1>
+          <h2>
+            Error de sesión :&#40; <br/>
+            Por favor, vuelva al inicio de sesión.
+          </h2>
+          <Link to={"/"} className="error-link">Volver al inicio de sesión</Link>
+        </div>
+        <Scripts />
+      </body>
+    </html>);
+  }
+
+  return contentError;
+}
+
