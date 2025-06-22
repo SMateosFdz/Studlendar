@@ -57,8 +57,12 @@ export async function action({ request }: ActionFunctionArgs) {
     }
   }
 
+  const bcrypt = require('bcryptjs');
+
+  userData.password = bcrypt.hashSync(userData.password.toString(), 8);
+
   await addUser(userData);
-  return redirect("/formOne");
+  return redirect("/");
 }
 
 export function links() {
