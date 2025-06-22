@@ -14,3 +14,23 @@ export async function addUser(userData) {
         throw error;
     }
 }
+
+
+export async function updateUser(userData, preferences) {
+    try {
+        await prisma.user.update({
+            where: {
+                email: userData.email
+            },
+            data: {
+                nameUser: userData.nameUser,
+                password: userData.password,
+                preferences: preferences,
+            }
+        });
+
+        return {ok: true};
+    } catch(error){
+        throw error;
+    }
+}

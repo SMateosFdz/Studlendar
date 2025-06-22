@@ -9,11 +9,11 @@ export async function addEvent(eventData) {
             color: eventData.color,
             notes: eventData.notes,
             subject: {
-                connect: {name: eventData.subjectName},
+                connect: {id: eventData.subjectId},
             },
+            subjectName: eventData.subjectName,
             date: new Date(eventData.date),
             completed: eventData.completed,
-            
         }});
 
         return {ok: true};

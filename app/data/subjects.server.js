@@ -5,7 +5,8 @@ export async function addSubject(subjectData) {
         await prisma.subject.create({data: {
 
             name: subjectData.name,
-            sessions: subjectData.sessions,
+            hours: subjectData.hours,
+            sessionSize: subjectData.sessionSize,
             sessionOrg: subjectData.sessionOrg,
             initialDate: new Date(subjectData.initialDate),
             endDate: new Date(subjectData.endDate),

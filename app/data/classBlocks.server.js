@@ -8,11 +8,13 @@ export async function addClassBlock(classBlockData) {
             name: classBlockData.name,
             repetition: classBlockData.repetition,
             subject: {
-                connect: {name: classBlockData.subjectName},
+                connect: {id: classBlockData.subjectId},
             },
+            subjectName: classBlockData.subjectName,
             time: classBlockData.time,
             date: new Date(classBlockData.date),
             completed: classBlockData.completed,
+            notes: classBlockData.notes,
         }});
 
         return {ok: true};

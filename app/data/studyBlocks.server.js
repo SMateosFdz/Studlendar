@@ -8,11 +8,13 @@ export async function addStudyBlock(studyBlockData) {
             repetition: studyBlockData.repetition,
             name: studyBlockData.name,
             subject: {
-                connect: {name: studyBlockData.subjectName},
+                connect: {id: studyBlockData.subjectId},
             },
+            subjectName: studyBlockData.subjectName,
             time: studyBlockData.time,
             date: new Date(studyBlockData.date),
             completed: studyBlockData.completed,
+            notes: studyBlockData.notes,
         }});
 
         return {ok: true};
