@@ -8,10 +8,10 @@ export function filterDates(events, currentDate) {
     sunday.setHours(23,59,59,999);
 
     const filteredEvents = events.filter(event => {
-        /* if(event.date.slice(-1) === "Z"){
-            dateF = event.date.substring(0, event.date.length - 1);
-            dateF = event.date + "-02:00";
+        /* if(event.repetition == "semanal"){ //TODO revisar si esta parte funciona correctamente
+            return true;
         } */
+
         const eventDate = new Date(event.date);
         return eventDate >= monday && eventDate <= sunday;
     });

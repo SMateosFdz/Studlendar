@@ -54,3 +54,12 @@ export function getDaysOfWeek(currentDate){
     
   return monthNumbers;
 }
+
+export function getWeekNumber(currentDate){
+  const week = new Date(currentDate);
+  week.setDate(week.getDate() + 4 - (week.getDay() || 7));
+  const yearStart = new Date(week.getFullYear(), 0, 1);
+  const weekNumber = Math.ceil((((week - yearStart) / 86400000) + 1) / 7);
+
+  return weekNumber;
+}
