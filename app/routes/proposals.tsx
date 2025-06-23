@@ -8,7 +8,6 @@ import { prisma } from "~/data/database.server";
 import { addStudyBlock } from "~/data/studyBlocks.server";
 import { getDaysOfWeek } from "~/utils/date";
 import type { StudyBlock } from "~/interfaces/studyblock";
-const ObjectId = require('mongodb').ObjectId;
 
 function showSubjectProposals(subject: any, preferences) {
   const matrix = Array.from({ length: 200 }, (_, i) => i);
@@ -126,6 +125,8 @@ export default function Proposals() {
   const [isVisible, setIsVisible] = useState(true);
   const [isChecked, setIsChecked] = useState(createInitialSubjects);
   const [numberChecked, setNumberChecked] = useState(isChecked.length);
+
+  console.log(selectedValues);
 
   const toggleVisibility = () => {
     setIsVisible((prev) => !prev);
