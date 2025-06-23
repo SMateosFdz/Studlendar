@@ -81,40 +81,37 @@ export default function SubjectReview() {
   const { subjects, studyBlocks } = useLoaderData();
   const datasets: { label: string; data: number[]; backgroundColor: string; }[] = [];
 
-  const actualDay = (new Date().getUTCDay() + 6) % 7;
-  const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-
-  const colors = [ "red", "blue", "white"];
-  let i = -1;
-
-  if (studyBlocks.length > 0) {
-    studyBlocks.map((block) => {
-    const date = new Date(block.date);
-      let dayOfWeek = (date.getUTCDay() + 6) % 7;
-      if(actualDay == dayOfWeek){
-        i++;
-        const object = {
+  if (subjects.length > 0) {
+    subjects.map((subject) => {
+      const object = {
         label: "",
-        data: [0],
-        backgroundColor: colors[i],
+        data: [0, 0, 0, 0, 0, 0, 0],
+        backgroundColor: "red",
       }
-      object.label = block.name;      
-      object.data.splice(dayOfWeek, 0, block.completed);
+      object.label = subject.name;
+
+      if (studyBlocks.length > 0) {
+        studyBlocks.map((block) => {
+          if (block.subjectId == subject.id) {
+            const date = new Date(block.date);
+            let dayOfWeek = (date.getUTCDay() + 6) % 7;
+            object.data.splice(dayOfWeek, 0, block.completed);
+          }
+        })
+      }
       datasets.push(object);
-      }
-      
     })
   }
 
   const [data, setData] = useState({
-    labels: [days[actualDay]],
+    labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
     datasets: datasets,
   });
 
   return (
     <div>
       <header>
-        <h1>Studlendar - revisión diaria</h1>
+        <h1>Studlendar - revisión por asignatura</h1>
       </header>
       <main>
         <div className='chart-container'>
@@ -133,3 +130,4 @@ export function links() {
     { rel: "stylesheet", href: styles },
   ];
 }
+

@@ -1,0 +1,19 @@
+footer{
+    margin: 20px;
+}
+
+footer a{
+  border: 1px solid #023e8a;
+  border-radius: 10px;
+  margin: 10px;
+  background-color: white;
+  color:  #023e8a;
+  text-decoration: none;
+  padding: 5px;
+}
+
+footer a:hover{
+  background-color: #023e8a;
+  color: white;
+  border: 1px solid white;
+}
