@@ -1,5 +1,6 @@
 export function Calculate(blocks, hours, day){
     let flag = false;
+    let blockName = "";
     const ids = [];
     for(let i=25; i <= 209; i += 8){
         ids.push(i + day - 1);
@@ -11,8 +12,9 @@ export function Calculate(blocks, hours, day){
     blocks.map((block) => {
         if(block.blockId == id){
             flag = true;
+            blockName = block.name;
         }
     })
 
-    return flag;
+    return {flag, blockName}
 }
