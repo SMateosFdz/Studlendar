@@ -1,11 +1,14 @@
-import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Form, Link, redirect, useLoaderData } from "@remix-run/react";
-import { userId } from "~/cookies.server";
+import { getSession, requireUserId } from "~/sessions.server";
 import { prisma } from "~/data/database.server";
 import styles from "~/styles/configure.css";
 
-export async function loader() {
-  const allSubjects = await prisma.subject.findMany();
+export async function loader({ request }: LoaderFunctionArgs) {
+  let userId = await requireUserId(request);
+  const allSubjects = await prisma.subject.findMany({
+    where: { authorId: userId },
+  });
 
   return allSubjects.length;
 }
@@ -37,29 +40,15 @@ export default function Configure() {
           </svg>
         </Link>
         <br></br>
-        <Link className="sessionForm__link" to="/colorCode">
-          <span>Configurar código de color</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-palette" viewBox="0 0 16 16">
-            <path d="M8 5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3m4 3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3M5.5 7a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m.5 6a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
-            <path d="M16 8c0 3.15-1.866 2.585-3.567 2.07C11.42 9.763 10.465 9.473 10 10c-.603.683-.475 1.819-.351 2.92C9.826 14.495 9.996 16 8 16a8 8 0 1 1 8-8m-8 7c.611 0 .654-.171.655-.176.078-.146.124-.464.07-1.119-.014-.168-.037-.37-.061-.591-.052-.464-.112-1.005-.118-1.462-.01-.707.083-1.61.704-2.314.369-.417.845-.578 1.272-.618.404-.038.812.026 1.16.104.343.077.702.186 1.025.284l.028.008c.346.105.658.199.953.266.653.148.904.083.991.024C14.717 9.38 15 9.161 15 8a7 7 0 1 0-7 7"/>
-          </svg>
-        </Link>
-        <br></br>
         <div className="form__container">
           <Form method="post">
-          <input
+          <button
             type="submit"
             name="move"
-            value={
-              number === 0
-                ? "Crea una asignatura antes de avanzar al paso siguiente"
-                : "Ir al calendario"
-            }
             disabled={number === 0}
-          ></input>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
-          </svg>
+          >{number === 0
+                ? "Crea una asignatura antes de avanzar al paso siguiente"
+                : "Ir al calendario"} <i className="bi bi-arrow-right"></i></button>
         </Form>
         </div>
       </div>
@@ -70,9 +59,10 @@ export default function Configure() {
 export async function action({ request }: ActionFunctionArgs) {
   let selectedValues = [];
   let flag = false;
-  const cookie = await userId.parse(request.headers.get("Cookie"));
+  const session = await getSession(request);
+  
   const allSubjects = await prisma.subject.findMany({
-    where: { authorId: cookie.userId },
+    where: { authorId: session.data.userId },
   });
 
   const values = allSubjects.map(async (subject) => {
