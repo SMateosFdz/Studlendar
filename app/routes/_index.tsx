@@ -1,10 +1,10 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
+import {  redirect } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
 import styles from "~/styles/index.css";
 import logo from "~/images/Studlendar.png";
 import { prisma } from "~/data/database.server";
-import { userId } from "~/cookies.server";
+import { createUserSession, getSession } from "~/sessions.server";
 
 export default function Index() {
   const data: any = useActionData();
@@ -33,8 +33,10 @@ export default function Index() {
       </main>
 
       <footer>
+        <h3>¿Has olvidado tu contraseña?</h3>
+        <a href={"/resetPassword"}>Recuperar contraseña</a>
         <h3>¿No tienes cuenta?</h3>
-        <Link to="/newAccount">Crea una nueva cuenta</Link>
+        <Link to={"/newAccount"}>Crea una nueva cuenta</Link>
       </footer>
     </div>
   );
@@ -45,9 +47,11 @@ export async function action({ request }: ActionFunctionArgs) {
   const allUser = await prisma.user.findMany();
   const userData = Object.fromEntries(formData);
 
+  const bcrypt = require('bcryptjs');
+
   for (var nameComprobation of allUser) {
     if (userData.nameUser.toString() === nameComprobation.nameUser) {
-      if (userData.password.toString() !== nameComprobation.password) {
+      if (!bcrypt.compareSync(userData.password.toString(),nameComprobation.password)) {
         return { message: "Contraseña incorrecta, prueba de nuevo" };
       } else {
         const user = await prisma.user.findFirst({
@@ -58,25 +62,20 @@ export async function action({ request }: ActionFunctionArgs) {
           where: { authorId: user?.nameUser },
         });
 
-
-        const cookieHeader = request.headers.get("Cookie");
-        const cookie = (await userId.parse(cookieHeader)) || {};
-        
-        cookie.userId = user?.nameUser;
-        
-
-        if (allSubjects.length > 0) {
-          return redirect("/main", {
-            headers: {
-              "Set-Cookie": await userId.serialize(cookie),
-            },
-          });
-        } else {
-          return redirect("/formOne", {
-            headers: {
-              "Set-Cookie": await userId.serialize(cookie),
-            },
-          });
+        if(allSubjects.length > 0){
+          return createUserSession({
+            request,
+            userId: userData.nameUser.toString(),
+            remember: true,
+            redirectTo: "/main",
+          })
+        } else{
+          return createUserSession({
+            request,
+            userId: userData.nameUser.toString(),
+            remember: true,
+            redirectTo: "/formOne",
+          })
         }
       }
     }
