@@ -53,6 +53,13 @@ h2{
     margin: 20px;
 }
 
+#sessionForm svg{
+    margin-left: 5px;
+    vertical-align: middle;
+    display: inline-block;
+    color: white;
+}
+
 #sessionForm fieldset{
     margin: auto;
     text-align: right;
@@ -62,6 +69,41 @@ h2{
 
 #sessionForm fieldset label{
     float: none;
+}
+
+#sessionForm .color-container{
+    display: flex;
+    flex-direction: column;
+    float: right;
+    width: auto;
+}
+
+#sessionForm .color-container select{
+    margin: 5px auto;
+    margin-top: 20px;
+    margin-right: 20px;
+    display: block;
+    width: 200px;
+}
+
+#sessionForm .color-container button{
+    display: inline;
+    width: fit-content;
+    margin: 5px auto;
+    background: white;
+    border-radius: 10px;
+}
+
+#sessionForm .color-container button svg{
+    width: 20px;
+    height: 20px;
+}
+
+#sessionForm .color-container input{
+    margin: 5px auto;
+    margin-right: 20px;
+    display: block;
+    width: 200px;
 }
 
 footer{

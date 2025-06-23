@@ -15,7 +15,6 @@
 }
 
 .full-navigation__button{
-  height: 4dvh;
   display: flex;
   align-items: center;
   border-radius: 10px;
@@ -43,27 +42,26 @@
   margin: 0;
 }
 
-.nav-item a button, .nav-item button{
+.nav-item a > button, .nav-item button{
   color: #023e8a;
   border-radius: 10px;
   background-color: white;
   border: 2px solid #023e8a;
 }
 
-.nav-item a button, .nav-item button {
+.nav-item a > button, .nav-item button {
   flex: 1;
   text-align: center;
-  line-height: 2.5dvh;
-  font-size: 0.9vw;
-  height: 4dvh;
+  font-size: 1.25rem;
+  padding: 10px;
 }
 
 .nav-item select{
   border-radius: 10px;
   border: 2px solid #023e8a;
   color: #023e8a;
-  font-size: 0.9vw;
-  height: 4dvh;
+  font-size: 1.25rem;
+  padding: 10px;
 }
 
 .nav-item select:hover, .nav-item select:focus{
@@ -89,11 +87,11 @@
   background-color: white;
 }
 
-.nav-item svg{
+.nav-item i{
   margin-left: 5px;
 }
 
-.nav-item svg, .nav-item span{
+.nav-item i, .nav-item span{
   vertical-align: middle;
   display: inline-block;
 }
@@ -112,7 +110,7 @@
   animation: slideIn 2s;
 }
 
-#title svg{
+#title {
   margin: auto 10px;
 }
 

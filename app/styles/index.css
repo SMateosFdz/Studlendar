@@ -25,7 +25,7 @@ h2{
     margin: auto;
     padding: 5px;
     width: fit-content;
-    border: 1px blue solid;
+    border: 1px #023E8A solid;
     border-radius: 10px;
     box-shadow: 2px 5px;
     background-color: white;
@@ -55,11 +55,13 @@ form input{
 }
 
 form label{
+    font-size: 1rem;
     display: block;
     color: white;
 }
 
 button, a{
+    font-size: 1rem;
     background-color:#023E8A;
     border: 1px solid black;
     color: white;
@@ -100,7 +102,7 @@ footer{
     animation: slideIn 3s;
 }
 
-@keyframes slideIn {
+/* @keyframes slideIn {
   0% {
     opacity: 0;
     transform: translateY(-100%);
@@ -109,4 +111,4 @@ footer{
     opacity: 1;
     transform: translateY(0);
   }
-}
+} */

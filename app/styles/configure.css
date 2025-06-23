@@ -21,31 +21,6 @@ h2{
     text-align: center;
 }
 
-
-/* #sessionForm input[type="submit"]{
-    width: 100%;
-    height: 100%;
-    margin: auto;
-}
-
-#sessionForm input[type="submit"], #sessionForm form{
-    background-color: #023E8A;
-    color: white;
-    border: 1px solid white;
-    padding: 5px;
-    margin: 10px;
-    border-radius: 10px;
-}
-
-#sessionForm input[type="submit"]:hover, #sessionForm form:hover{
-    background-color: white;
-    color: #023E8A;
-    border: 1px solid #023E8A;
-    padding: 5px;
-    margin: 10px;
-    border-radius: 10px;
-} */
-
 .form__container{
     width: fit-content;
     margin: auto;
@@ -61,39 +36,35 @@ h2{
     border-radius: 10px;
 }
 
-.form__container input{
+button{
     border: none;
     background: transparent;
     cursor: pointer;
     color: white;
+    border: 1px solid white;
     width: 100%;
     padding: 5px;
-    /*background-color: #023E8A;
-    color: white;
-    border: 1px solid white;
-    padding: 5px;
-    border-radius: 10px; */
     border-radius: 10px;
     vertical-align: middle;
     display: inline-block;
     z-index: 1;
 }
 
-.form__container form:hover, .form__container form:focus{
+button:hover:enabled, button:focus:enabled{
     background-color: white;
     color: #023E8A;
 }
 
-.form__container form:hover input{
+/* .form__container form:hover input{
     background: transparent;
     color: #023E8A;
-}
+} */
 
-.form__container svg{
+/* .form__container svg{
     stroke: currentColor;
     margin: 5px;
     z-index: 0;
-}
+} */
 
 .sessionForm__link{
     display: block;
@@ -119,4 +90,15 @@ h2{
 #sessionForm svg, #sessionForm span{
   vertical-align: middle;
   display: inline-block;
+}
+
+.form__container form{
+    border: none;
+}
+
+button:disabled{
+    background-color: grey;
+    cursor: not-allowed;
+    color: #505050;
+    border: none;
 }

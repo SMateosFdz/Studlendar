@@ -1,0 +1,25 @@
+:root{
+    background-color: rgb(220, 226, 253);
+    text-align: center;
+}
+
+h1, h2{
+    color: #023e8a;
+}
+
+.error-link{
+    font-size: 1.25rem;
+    color: white;
+    border: 1px solid white;
+    background-color: #023e8a;
+    padding: 5px;
+    border-radius: 10px;
+    text-decoration: none;
+}
+
+.error-link:hover{
+    cursor: pointer;
+    background-color: white;
+    color: #023e8a;
+    border: 1px solid #023e8a;
+}

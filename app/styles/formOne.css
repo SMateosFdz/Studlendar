@@ -30,16 +30,17 @@ h2{
     display: inline;
 }
 
-#sessionForm input[type="reset"], #sessionForm input[type="submit"]{
+#sessionForm input[type="submit"]{
     background-color: #023E8A;
     color: white;
     border: 1px solid white;
     padding: 5px;
     margin: 10px;
     border-radius: 10px;
+    font-size: 1.25rem;
 }
 
-#sessionForm input[type="reset"]:hover, #sessionForm input[type="submit"]:hover{
+#sessionForm input[type="submit"]:hover{
     background-color: white;
     color: #023E8A;
     border: 1px solid #023E8A;
@@ -48,7 +49,7 @@ h2{
     border-radius: 10px;
 }
 
-#sessionForm input[type="reset"]:disabled, #sessionForm input[type="submit"]:disabled{
+ #sessionForm input[type="submit"]:disabled{
     background-color: grey;
     color: white;
     border: 1px solid #023E8A;
@@ -63,6 +64,7 @@ label{
     color: white;
     float: left;
     margin: 20px;
+    font-size: 1.25rem;
 }
 
 a{
@@ -74,6 +76,7 @@ a{
     padding: 2px 5px;
     border: 1px solid white;
     border-radius: 10px;
+    font-size: 1.25rem;
 }
 
 a:hover{
@@ -99,5 +102,41 @@ fieldset label{
 
 hr{
     clear: both;
+}
+
+.days-btn-container {
+  float: right;
+  display: flex;
+  width: 400px;
+  align-items: center;
+  justify-content: space-evenly;
+  height: auto;
+}
+
+.day-btn {
+  display: none;
+}
+
+.day-label {
+  background-color: transparent;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  border: 2px solid white;
+  border-radius: 20%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 5px;
+}
+
+.day-btn:checked + .day-label {
+  background-color: white;
+  //background-image: linear-gradient(147deg, #00ccff 0%, #004cff 74%);
+  border: none;
+  color: #023E8A;
 }
 

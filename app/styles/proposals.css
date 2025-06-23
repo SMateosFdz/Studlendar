@@ -194,7 +194,7 @@ hr {
 }
 
 .class-item {
-  background: #023e8a;
+  background:rgba(2, 61, 138, 0.8);
   color: white;
   max-width: auto;
   border-radius: 6px;
