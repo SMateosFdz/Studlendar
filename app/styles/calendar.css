@@ -3,6 +3,7 @@
 }
 
 html{
+  overflow-y: hidden;
   scroll-behavior: smooth;
 }
 
@@ -15,19 +16,30 @@ html {
 .current-date{
   text-align: center;
   font-size: 1.25rem;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
 }
 
 .current-date button{
+  display: flex;
   border-radius: 10px;
-  background-color: #023e8a;
-  color: white;
+  background-color: white;
+  color: #023e8a;
   font-size: 1rem;
-  padding: 10px;
+  padding: 5px;
+  display: inline-block;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  text-align: center;
+  border: 2px solid #023e8a;
+  font-size: 1.25rem;
 }
 
 .current-date button:hover{
-  background-color: white;
-  color: #023e8a;
+  background-color: #023e8a;
+  color: white;
   cursor: pointer;
 }
 
@@ -35,7 +47,7 @@ html {
   position: sticky;
   margin: auto;
   display: grid;
-  grid-template-columns: 3dvw repeat(7, 13dvw);
+  grid-template-columns: 50px repeat(7, 13dvw);
   grid-template-rows: 3dvh repeat(24, 6.8dvh);
   box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
   border-radius: 8px;
@@ -69,7 +81,7 @@ html {
   transform: rotateY(0deg);
   transition: 0.6s;
   max-height: 70dvh;
-  overflow-y: scroll;
+  overflow-y: hidden;
   overflow-x: hidden;
 }
 
@@ -173,9 +185,7 @@ html {
 }
 
 .class-item {
-  background:rgba(2, 61, 138, 0.8);
-  color: white;
-  max-width: auto;
+  color: #023e8a;
   border-radius: 6px;
   padding: 5px;
   box-shadow: 0 2px 8px rgb(79 70 229 / 0.4);
@@ -183,16 +193,22 @@ html {
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  vertical-align: middle;
-  white-space: nowrap;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+  max-width: 6.5dvw;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  z-index: 1;
+  opacity: 0.75;
 }
 
 .class-item:hover {
-  background:rgba(199, 210, 254, 0.8);
   color: #023e8a;
+  text-decoration: underline;
+  opacity: 1;
 }
 
 .popup-show--true {
@@ -209,6 +225,59 @@ html {
   animation: appear 1s;
 }
 
+.show--true {
+  background-color: #caf0f8;
+  width: 500px;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.show--true h2 {
+  color: #023e8a;
+  text-align: center;
+}
+
+.show--true label{
+  float: left;
+  font-size: 1.15rem;
+}
+
+.show--true input, .show--true select, .show--true textarea, .show--true span, .show--true p{
+  float: right;
+  font-size: 1rem;
+}
+
+.show--true p{
+  margin: 0;
+}
+
+.show--true select, .show--true input, .show--true textarea{
+  width: 180px;
+}
+
+.show--true textarea{
+  margin-bottom: 10px;
+}
+
+.show--true input[type="submit"]{
+  float: none;
+  width: 150px;
+  margin: 10px;
+  background-color: white;
+  color: #023e8a;
+  border-radius: 5px;
+  border: 1px solid #023e8a;
+  font-size: 1.15rem;
+}
+
+.show--true input[type="submit"]:hover{
+  background-color: #023e8a;
+  color: white;
+  border: 1px solid #023e8a;
+  cursor: pointer;
+}
+
 .popup-show--false {
   display: none;
 }
@@ -221,16 +290,14 @@ html {
   cursor: pointer;
 }
 
-.show--true {
-  background-color: #caf0f8;
-  width: 600px;
-  padding: 10px;
-  border-radius: 10px;
+.popup__type button{
+  font-size: 1.15rem;
+  border: 2px solid #023e8a;
 }
 
-.show--true h2 {
-  color: #023e8a;
-  text-align: center;
+.popup__type button:hover:not(.selected){
+  cursor: pointer;
+  box-shadow: 2px 5px #023e8a;
 }
 
 .popup__title {
@@ -374,25 +441,16 @@ input:checked + .slider:before {
 }
 
 .left, .right{
-  height: 200px;
-  width: 30px;
   border-radius: 10px;
   background-color: #023e8a;
   color: white;
+  margin: 10px;
+  width: 40px;
 }
 
-.left.true{
-  position: fixed;
-  top: 50%;
-  left: 0.5dvw;
-  transform: translateY(-50%);
-}
-
-.right.true{
-  position: fixed;
-  top: 50%;
-  right: 0.5dvw;
-  transform: translateY(-50%);
+.left span, .right span{
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .left.false, .right.false{
@@ -444,7 +502,9 @@ footer a:hover{
   border: 1px solid white;
 }
 
-
+hr {
+  clear: both;
+}
 
 @keyframes appear {
   0% {

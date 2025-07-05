@@ -19,6 +19,7 @@ h2{
     margin: auto;
     padding: 15px;
     text-align: center;
+    font-size: 1.25rem;
 }
 
 .form__container{
@@ -94,6 +95,10 @@ button:hover:enabled, button:focus:enabled{
 
 .form__container form{
     border: none;
+}
+
+.form__container button{
+    font-size: 1.25rem;
 }
 
 button:disabled{

@@ -13,25 +13,37 @@ h2{
     color: #023E8A;
 }
 
-#sessionForm{
+#subjectForm{
     min-width: fit-content;
-    width: 50%;
+    width: 60%;
     border-radius: 10px;
     background-color: #023E8A;
     margin: auto;
     padding: 15px;
+    font-size: 1.25rem;
 }
 
-#sessionForm input[type="reset"], #sessionForm input[type="submit"]{
+.error{
+    background-color: white;
+    border-radius: 5px;
+    color: red;
+    margin: auto;
+    width: fit-content;
+    padding: 5px;
+    font-size: 1.25rem;
+}
+
+#subjectForm input[type="reset"], #subjectForm input[type="submit"]{
     background-color: #023E8A;
     color: white;
     border: 1px solid white;
     padding: 5px;
     margin: 10px;
     border-radius: 10px;
+    font-size: 1.25rem;
 }
 
-#sessionForm input[type="reset"]:hover, #sessionForm input[type="submit"]:hover{
+#subjectForm input[type="reset"]:hover:not(:disabled), #subjectForm input[type="submit"]:hover:not(:disabled){
     background-color: white;
     color: #023E8A;
     border: 1px solid #023E8A;
@@ -40,45 +52,54 @@ h2{
     border-radius: 10px;
 }
 
-#sessionForm input:not([type="reset"], [type="submit"], [type="radio"]), #sessionForm select{
+#subjectForm input[type="reset"]:disabled, #subjectForm input[type="submit"]:disabled{
+    cursor: not-allowed;
+    background-color:grey;
+    color:rgb(39, 39, 39);
+    padding: 5px;
+    margin: 10px;
+    border-radius: 10px;
+}
+
+#subjectForm input:not([type="reset"], [type="submit"], [type="radio"]), #subjectForm select{
     float: right;
     margin: 20px;
     width: 200px;
 }
 
-#sessionForm label{
+#subjectForm label{
     display: inline;
     color: white;
     float: left;
     margin: 20px;
 }
 
-#sessionForm svg{
+#subjectForm svg{
     margin-left: 5px;
     vertical-align: middle;
     display: inline-block;
     color: white;
 }
 
-#sessionForm fieldset{
+#subjectForm fieldset{
     margin: auto;
     text-align: right;
     border: 0 none;
     margin: 20px;
 }
 
-#sessionForm fieldset label{
+#subjectForm fieldset label{
     float: none;
 }
 
-#sessionForm .color-container{
+#subjectForm .color-container{
     display: flex;
     flex-direction: column;
     float: right;
     width: auto;
 }
 
-#sessionForm .color-container select{
+#subjectForm .color-container select{
     margin: 5px auto;
     margin-top: 20px;
     margin-right: 20px;
@@ -86,7 +107,7 @@ h2{
     width: 200px;
 }
 
-#sessionForm .color-container button{
+#subjectForm .color-container button{
     display: inline;
     width: fit-content;
     margin: 5px auto;
@@ -94,12 +115,12 @@ h2{
     border-radius: 10px;
 }
 
-#sessionForm .color-container button svg{
+#subjectForm .color-container button svg{
     width: 20px;
     height: 20px;
 }
 
-#sessionForm .color-container input{
+#subjectForm .color-container input{
     margin: 5px auto;
     margin-right: 20px;
     display: block;
@@ -121,6 +142,7 @@ a {
   padding: 2px 5px;
   border: 1px solid white;
   border-radius: 10px;
+  font-size: 1.25rem;
 }
 
 a:hover {

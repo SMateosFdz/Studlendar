@@ -1,35 +1,12 @@
-/* header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-} */
-
 #full-navigation {
   text-align: center;
   width: 100%;
   animation: slideIn 2s;
-  display: flex;
-  flex-direction: row-reverse;
   align-items: center;
-  margin-bottom: 20px;
 }
 
-.full-navigation__button{
-  display: flex;
-  align-items: center;
-  border-radius: 10px;
-  background-color: white;
-  border: 1px solid #023e8a;
-}
-
-.full-navigation__button:hover{
-  background-color: #023e8a;
-  cursor: pointer;
-}
-
-.full-navigation__button img{
-  height: 4dvh;
-  color: #023e8a;
+#full-navigation-smallWidth {
+  display: none;
 }
 
 .navigation {
@@ -42,21 +19,39 @@
   margin: 0;
 }
 
-.nav-item a > button, .nav-item button{
+.nav-item {
+  width: 20%;
+}
+
+.nav-item div {
+  background-color: white;
+  border: 2px solid #023e8a;
+  border-radius: 10px;
+  margin: auto;
+  font-size: 1.25rem;
+}
+
+.nav-item div > a {
+  display: block;
+  margin: 10px;
+}
+
+.nav-item a > button,
+.nav-item button {
   color: #023e8a;
   border-radius: 10px;
   background-color: white;
   border: 2px solid #023e8a;
 }
 
-.nav-item a > button, .nav-item button {
-  flex: 1;
+.nav-item a > button,
+.nav-item button {
   text-align: center;
   font-size: 1.25rem;
   padding: 10px;
 }
 
-.nav-item select{
+.nav-item select {
   border-radius: 10px;
   border: 2px solid #023e8a;
   color: #023e8a;
@@ -64,12 +59,13 @@
   padding: 10px;
 }
 
-.nav-item select:hover, .nav-item select:focus{
+.nav-item select:hover,
+.nav-item select:focus {
   background-color: #023e8a;
   color: white;
 }
 
-.nav-item select:hover > option:hover{
+.nav-item select:hover > option:hover {
   background-color: white;
   color: #023e8a;
 }
@@ -87,16 +83,18 @@
   background-color: white;
 }
 
-.nav-item i{
+.nav-item i {
   margin-left: 5px;
 }
 
-.nav-item i, .nav-item span{
+.nav-item i,
+.nav-item span {
   vertical-align: middle;
   display: inline-block;
 }
 
-.nav-item a button:hover, .nav-item button:hover {
+.nav-item a button:hover,
+.nav-item button:hover {
   background-color: #023e8a;
   color: white;
   cursor: pointer;
@@ -125,14 +123,152 @@
   }
 }
 
-@keyframes run {
+@keyframes opacity {
   0% {
-    left: 0;
-  }
-  50% {
-    left: 100%;
+    opacity: 0;
   }
   100% {
-    left: 0;    
+    opacity: 1;
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  #full-navigation {
+    display: none;
+  }
+
+  #full-navigation-smallWidth {
+    display: inline;
+    position: absolute;
+    left: 20px;
+    z-index: 1000;
+    animation: slideIn 2s;
+  }
+
+  .navigation-button{
+    position: absolute;
+    left: 20px;
+    top: -30px;
+    font-size: 1.25rem;
+    color: #023e8a;
+    background-color: white;
+    border-radius: 5px;
+    border: 2px solid #023e8a;
+  }
+
+  .navigation-button:hover{
+    color: white;
+    background-color: #023e8a;
+  }
+
+  .navigation-button i{
+    display: inline-block;
+  }
+
+  .navigation-button.open-true .bi{
+    transform: rotate(180deg);
+    transition: all 0.8s;
+  }
+
+  .navigation-button.open-false .bi{
+    transform: rotate(0deg);
+    transition: all 0.3s;
+  }
+
+  .navigation-smallWidth {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 0;
+    list-style: none;
+    width: 100%;
+    margin: 0;
+    background-color: white;
+    border-radius: 10px;
+    border: 1px solid #023e8a;
+    animation: opacity 1s;
+  }
+
+  .nav-item-smallWidth {
+    width: auto;
+    margin: 5px;
+  }
+
+  .nav-item-smallWidth div {
+    background-color: white;
+    border: 2px solid #023e8a;
+    border-radius: 10px;
+    margin: auto;
+    font-size: 1rem;
+  }
+
+  .nav-item-smallWidth div > a {
+    display: block;
+    margin: 10px;
+  }
+
+  .nav-item-smallWidth a > button,
+  .nav-item-smallWidth button {
+    color: #023e8a;
+    border-radius: 10px;
+    background-color: white;
+    border: 2px solid #023e8a;
+  }
+
+  .nav-item-smallWidth a > button,
+  .nav-item-smallWidth button {
+    text-align: center;
+    font-size: 1rem;
+    padding: 10px;
+  }
+
+  .nav-item-smallWidth select {
+    border-radius: 10px;
+    border: 2px solid #023e8a;
+    color: #023e8a;
+    font-size: 1rem;
+    padding: 10px;
+  }
+
+  .nav-item-smallWidth select:hover,
+  .nav-item-smallWidth select:focus {
+    background-color: #023e8a;
+    color: white;
+  }
+
+  .nav-item-smallWidth select:hover > option:hover {
+    background-color: white;
+    color: #023e8a;
+  }
+
+  .nav-item-smallWidth > .link {
+    color: #023e8a;
+    text-decoration: none;
+    margin: 20px;
+    border: 2px solid #023e8a;
+    padding: 5px;
+    border-radius: 10px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    background-color: white;
+  }
+
+  .nav-item-smallWidth i {
+    margin-left: 5px;
+  }
+
+  .nav-item-smallWidth i,
+  .nav-item-smallWidth span {
+    vertical-align: middle;
+    display: inline-block;
+  }
+
+  .nav-item-smallWidth a button:hover,
+  .nav-item-smallWidth button:hover {
+    background-color: #023e8a;
+    color: white;
+    cursor: pointer;
   }
 }
