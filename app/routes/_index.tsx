@@ -10,7 +10,7 @@ export default function Index() {
   const data: any = useActionData();
 
   return (
-    <div>
+    <div className="container">
       <header>
         <h1>Bienvenido a Studlendar</h1>
       </header>
