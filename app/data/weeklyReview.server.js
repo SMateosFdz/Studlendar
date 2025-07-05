@@ -5,6 +5,9 @@ export async function addReview(reviewData) {
         await prisma.weeklyReview.create({data: {
             date: reviewData.date,
             satisfaction: reviewData.satisfaction,
+            author: {
+                connect: {nameUser: reviewData.authorId},
+            },
         }});
 
         return {ok: true};
