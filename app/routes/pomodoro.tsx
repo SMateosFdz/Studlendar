@@ -1,201 +1,140 @@
-import { useEffect, useRef, useState } from "react";
-
-import pomodoroStyles from "~/styles/pomodoro.css";
-import navStyles from "~/styles/navigation.css";
-
-
-type TimerMode = "pomodoro" | "shortBreak" | "longBreak";
-
-const defaultDurations = {
-  pomodoro: 25 * 60,
-  shortBreak: 5 * 60,
-  longBreak: 15 * 60,
-};
+import { useState, useEffect } from 'react';
 
 export default function Pomodoro() {
-  const [durations, setDurations] = useState({
-    pomodoro: defaultDurations.pomodoro,
-    shortBreak: defaultDurations.shortBreak,
-    longBreak: defaultDurations.longBreak,
-  });
+  const [pomodoroTime, setPomodoroTime] = useState(25);
+  const [shortBreakTime, setShortBreakTime] = useState(5);
+  const [longBreakTime, setLongBreakTime] = useState(15);
 
-  const [mode, setMode] = useState<TimerMode>("pomodoro");
-  const [timeLeft, setTimeLeft] = useState(durations.pomodoro);
-  const [isRunning, setIsRunning] = useState(false);
+  const [isActive, setIsActive] = useState(false);
+  const [mode, setMode] = useState('pomodoro');
+  const [cycles, setCycles] = useState(0);
+  const [startTime, setStartTime] = useState(Math.floor(Date.now() / 1000));
+
+  const getTimeLeft = () => {
+    const currentTime = Math.floor(Date.now() / 1000);
+    const duration = mode === 'pomodoro' ? pomodoroTime * 60 :
+      mode === 'pausa corta' ? shortBreakTime * 60 :
+        longBreakTime * 60;
+    return Math.max(0, duration - (currentTime - startTime));
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const resetTimer = () => {
+    setIsActive(false);
+    setStartTime(0);
+    changeMode(mode);
+  };
+
+  const changeMode = (newMode: string) => {
+    setIsActive(false);
+    setMode(newMode);
+    setStartTime(Math.floor(Date.now() / 1000));
+  };
 
   useEffect(() => {
-    setTimeLeft(durations[mode]);
-    setIsRunning(false);
-  }, [mode, durations]);
+    let interval: NodeJS.Timeout | null = null;
 
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+    if (isActive) {
+      interval = setInterval(() => {
+        if (getTimeLeft() <= 0) {
+          setIsActive(false);
 
-  useEffect(() => {
-    if (isRunning) {
-      intervalRef.current = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            // Timer finished
-            // If currently pomodoro, switch UI to short break paused
-            if (mode === "pomodoro") {
-              setMode("shortBreak");
-              // Do not start short break automatically
-              setIsRunning(false);
-              return durations.shortBreak;
-            } else {
-              // For other modes, just stop timer at 0
-              setIsRunning(false);
-              return 0;
-            }
+          if (mode === 'pomodoro') {
+            const newCycles = cycles + 1;
+            setCycles(newCycles);
+            changeMode(newCycles % 4 === 0 ? 'pausa larga' : 'pausa corta');
+          } else {
+            changeMode('pomodoro');
           }
-          return prev - 1;
-        });
+        }
       }, 1000);
     }
+
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (interval) clearInterval(interval);
     };
-  }, [isRunning, mode, durations.shortBreak]);
+  }, [isActive, mode, cycles]);
 
-  // Format seconds as MM:SS
-  function formatTime(seconds: number) {
-    const m = Math.floor(seconds / 60)
-      .toString()
-      .padStart(2, "0");
-    const s = (seconds % 60).toString().padStart(2, "0");
-    return `${m}:${s}`;
-  }
+  const updatePomodoroTime = (value: number) => {
+    setPomodoroTime(value);
+    if (mode === 'pomodoro') resetTimer();
+  };
 
-  // Handlers for inputs change (in minutes)
-  function handleDurationChange(e: React.ChangeEvent<HTMLInputElement>, type: TimerMode) {
-    let val = parseInt(e.target.value);
-    if (isNaN(val) || val < 1) val = 1;
-    setDurations((d) => ({ ...d, [type]: val * 60 }));
-  }
+  const updateShortBreakTime = (value: number) => {
+    setShortBreakTime(value);
+    if (mode === 'pausa corta') resetTimer();
+  };
+
+  const updateLongBreakTime = (value: number) => {
+    setLongBreakTime(value);
+    if (mode === 'pausa larga') resetTimer();
+  };
+
+  const timeLeft = getTimeLeft();
 
   return (
-    <div className="pomodoro">
-        <h3>Pomodoro</h3>
-        <div className="pomodoro__mode-buttons" role="tablist" aria-label="Timer Modes">
-          <button
-            role="tab"
-            aria-selected={mode === "pomodoro"}
-            aria-controls="timer"
-            id="mode-pomodoro"
-            className={mode === "pomodoro" ? "active" : ""}
-            onClick={() => setMode("pomodoro")}
-            disabled={isRunning}
-          >
-            Pomodoro
-          </button>
-          <button
-            role="tab"
-            aria-selected={mode === "shortBreak"}
-            aria-controls="timer"
-            id="mode-shortBreak"
-            className={mode === "shortBreak" ? "active" : ""}
-            onClick={() => setMode("shortBreak")}
-            disabled={isRunning}
-          >
-            Pausa Corta
-          </button>
-          <button
-            role="tab"
-            aria-selected={mode === "longBreak"}
-            aria-controls="timer"
-            id="mode-longBreak"
-            className={mode === "longBreak" ? "active" : ""}
-            onClick={() => setMode("longBreak")}
-            disabled={isRunning}
-          >
-            Pausa larga
-          </button>
+    <div className='pomodoro'>
+      <div className='pomodoro__mode-buttons'>
+        <button onClick={() => changeMode('pomodoro')}>Pomodoro</button>
+        <button onClick={() => changeMode('pausa corta')}>Pausa corta</button>
+        <button onClick={() => changeMode('pausa larga')}>Pausa larga</button>
+      </div>
+
+      <div className='pomodoro__container'>
+        <div className='pomodoro__container--timer'>
+          {isActive ?
+            <h1>{formatTime(timeLeft)}</h1> :
+            <h1>{mode === "pomodoro" ? pomodoroTime : mode === "pausa corta" ? shortBreakTime : longBreakTime}:00</h1>}
+          <p>Modo actual: {mode}</p>
+          <p>Pomodoros completados: {cycles}</p>
         </div>
-        <div
-          id="timer"
-          role="timer"
-          aria-live="polite"
-          className="pomodoro__timer-display"
-          aria-label={`Time left in ${mode === "pomodoro" ? "Pomodoro" : mode === "shortBreak" ? "Short Break" : "Long Break"} mode`}
-        >
-          {formatTime(timeLeft)}
-        </div>
-        <div className="pomodoro__controls">
-          {isRunning ? (
-            <button onClick={() => setIsRunning(false)} aria-label="Pause Timer">
-              Pausar
-            </button>
-          ) : (
-            <button
-              onClick={() => {
-                if (timeLeft === 0) {
-                  setTimeLeft(durations[mode]);
-                }
-                setIsRunning(true);
-              }}
-              aria-label="Start Timer"
-              disabled={timeLeft === 0}
-            >
-              Empezar
-            </button>
-          )}
-          <button
-            onClick={() => {
-              setIsRunning(false);
-              setTimeLeft(durations[mode]);
-            }}
-            aria-label="Reset Timer"
-          >
-            Reiniciar
+
+        <div className='pomodoro__container--starter'>
+          <button onClick={() => setIsActive(!isActive)}>
+            {isActive ? 'Pause' : 'Start'}
           </button>
+          <button onClick={resetTimer}>Reset</button>
         </div>
-        <div className="pomodoro__duration-inputs" aria-label="Set durations in minutes">
-          <label htmlFor="pomodoro-duration">
-            Pomodoro (min):
+
+        <div className='pomodoro__container--duration-inputs'>
+          <h2>Configuración</h2>
+          <div>
+            <label>Pomodoro: {pomodoroTime} minutos</label>
             <input
-              id="pomodoro-duration"
-              type="number"
-              min={1}
-              value={Math.floor(durations.pomodoro / 60)}
-              onChange={(e) => handleDurationChange(e, "pomodoro")}
-              disabled={isRunning}
-              aria-describedby="pomodoro-desc"
+              type="range"
+              min="25"
+              max="120"
+              value={pomodoroTime}
+              onChange={(e) => updatePomodoroTime(parseInt(e.target.value))}
             />
-          </label>
-          <br></br>
-          <label htmlFor="shortBreak-duration">
-            Pausa corta (min):
+          </div>
+          <div>
+            <label>Pausa corta: {shortBreakTime} minutos</label>
             <input
-              id="shortBreak-duration"
-              type="number"
-              min={1}
-              value={Math.floor(durations.shortBreak / 60)}
-              onChange={(e) => handleDurationChange(e, "shortBreak")}
-              disabled={isRunning}
-              aria-describedby="shortBreak-desc"
+              type="range"
+              min="5"
+              max="30"
+              value={shortBreakTime}
+              onChange={(e) => updateShortBreakTime(parseInt(e.target.value))}
             />
-          </label>
-          <br></br>
-          <label htmlFor="longBreak-duration">
-            Pausa larga (min):
+          </div>
+          <div>
+            <label>Pausa larga: {longBreakTime} minutos</label>
             <input
-              id="longBreak-duration"
-              type="number"
-              min={1}
-              value={Math.floor(durations.longBreak / 60)}
-              onChange={(e) => handleDurationChange(e, "longBreak")}
-              disabled={isRunning}
-              aria-describedby="longBreak-desc"
+              type="range"
+              min="15"
+              max="60"
+              value={longBreakTime}
+              onChange={(e) => updateLongBreakTime(parseInt(e.target.value))}
             />
-          </label>
+          </div>
         </div>
+      </div>
     </div>
   );
-}
-
-export function links() {
-  return [
-    { rel: "stylesheet", href: pomodoroStyles },
-    { rel: "stylesheet", href: navStyles },
-  ];
 }
