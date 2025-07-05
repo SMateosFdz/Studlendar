@@ -1,10 +1,10 @@
-import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { Link, useActionData } from "@remix-run/react";
+import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
+import { Link, useActionData, useLoaderData } from "@remix-run/react";
 import { addSubject } from "~/data/subjects.server";
 import styles from "~/styles/createSubject.css";
 import { prisma } from "~/data/database.server";
-import { SetStateAction, useState } from "react";
+import { useState } from "react";
 import { Tooltip } from "~/components/Tooltip";
 import { getSession } from "~/sessions.server";
 
@@ -13,6 +13,27 @@ export const meta: MetaFunction = () => {
     { title: "Studlendar" },
   ];
 };
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const session = await getSession(request);
+
+  if(session.data.userId == ""){
+    throw new Error("Error de sesión");
+  }
+
+  const latestSubject = await prisma.subject.findMany({
+    orderBy: {
+      id: 'desc',
+    },
+    take: 1,
+  });
+
+  const classBlocks = await prisma.classBlock.findMany({
+    where: { subjectId: latestSubject[0].id },
+  });
+
+  return json(classBlocks);
+}
 
 const colors = [
   { label: 'Grey', value: '#CCCCCC' },
@@ -25,44 +46,57 @@ const colors = [
 ];
 
 export default function CreateSubject() {
+  const classBlocks = useLoaderData();
   const data: any = useActionData();
   const [selectedColor, setSelectedColor] = useState('');
   const [colorInput, setColorInput] = useState(false);
   const [sessionSize, setSessionSize] = useState(0.5);
+  const [studyHours, setStudyHours] = useState(1);
+  const [errorStudyHours, setErrorStudyHours] = useState(false);
 
-  function handleSelectedColor(colorValue: string, inputFlag: boolean){
+  function handleSelectedColor(colorValue: string, inputFlag: boolean) {
     setSelectedColor(colorValue);
     setColorInput(inputFlag);
   }
+
+  function handleStudy(event) {
+    if (event.target.id == "hours") {
+      console.log(sessionSize, event.target.value)
+      setStudyHours(Number(event.target.value));
+      if (sessionSize > Number(event.target.value)) {
+        setErrorStudyHours(true);
+      } else {
+        setErrorStudyHours(false);
+      }
+    } else {
+      setSessionSize(Number(event.target.value));
+      if (Number(event.target.value) > studyHours) {
+        setErrorStudyHours(true);
+      } else {
+        setErrorStudyHours(false);
+      }
+    }
+  }
+
+  /* functionHandleDates(event){
+    
+  } */
 
   return (
     <>
       <h1>Bienvenido a Studlendar</h1>
       <h2>Nueva asignatura</h2>
-      <form method="post" id="sessionForm">
+      <form method="post" id="subjectForm">
         <label htmlFor="name">Nombre de la asignatura</label>
         <input type="text" id="name" name="name" required></input>
         <hr></hr>
         <label htmlFor="hours">
-          ¿Cuántas horas a la semana quieres enfocarte en el estudio?
+          ¿Cuántas horas a la semana quieres enfocarte en el estudio? {studyHours} horas
         </label>
-        <input type="number" id="hours" name="hours" min={1} required></input>
+        <input type="range" id="hours" name="hours" min={1} max={24} step={0.5} defaultValue={1} required onInput={() => handleStudy(event)}></input>
         <hr></hr>
         <label htmlFor="sessionSize">Tamaño de las sesiones de estudio: {sessionSize} horas</label>
-        <input type="range" id="sessionSize" name="sessionSize" min={0.5} max={6} step={0.5} defaultValue={0.5} onChange={() => setSessionSize(event?.target.value)}></input>
-        <hr></hr>
-        <label htmlFor="sessionOrg">Organización de las sesiones de estudio
-          <Tooltip content={"Esta opción permite establecer los bloques de estudio en función de los bloques de clase"} placement="right"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-info-circle" viewBox="0 0 16 16">
-            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-            <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0" />
-          </svg></Tooltip>
-        </label>
-
-        <select name="sessionOrg" id="sessionOrg" required>
-          <option value="por-dia">En el día</option>
-          <option value="dia-antes">Previo</option>
-          <option value="dia-despues">Posterior</option>
-        </select>
+        <input type="range" id="sessionSize" name="sessionSize" min={0.5} max={6} step={0.5} defaultValue={0.5} onChange={() => handleStudy(event)}></input>
         <hr></hr>
         <label htmlFor="initialDate">
           Fecha de inicio de la asignatura
@@ -74,7 +108,12 @@ export default function CreateSubject() {
         </label>
         <input type="date" id="endDate" name="endDate" required></input>
         <hr></hr>
-        <label>Color asociado a la asignatura:</label>
+        <label>Color asociado a la asignatura:
+          <Tooltip content={"Si no escoges ningún color, se pondrá el color por defecto, el azul"} placement="right"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-info-circle" viewBox="0 0 16 16">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+            <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0" />
+          </svg></Tooltip>
+        </label>
         <div className="color-container">
           <select
             id="color"
@@ -87,14 +126,14 @@ export default function CreateSubject() {
               border: `2px solid ${selectedColor === "#023E8A" ? "white" : "black"}`,
             }}
           >
-            <option value="" disabled style={{ background: "white" }}>
+            <option value="" selected disabled style={{ background: "white" }}>
               -- Selecciona un color --
             </option>
             {colors.map(({ label, value }) => (
               <option key={value} value={value} style={{ background: value, color: value === "#023E8A" ? "white" : "black" }}>
                 {label}
               </option>
-              
+
             ))}
             <option value={selectedColor} hidden={!colorInput} style={{ background: "white" }}>
               Otro color
@@ -103,12 +142,14 @@ export default function CreateSubject() {
           <button type="button" id="add-color-button" aria-label="Add a new color" title="Add a new color" onClick={() => setColorInput(!colorInput)}>
             Elige otro color
           </button>
-          {colorInput && (<input type="color" id="color" name="color" aria-label="Choose a new color to add to the palette" onChange={() => handleSelectedColor(event?.target.value, true)}/>)}
+          {colorInput && (<input type="color" id="color" name="color" aria-label="Choose a new color to add to the palette" onChange={() => handleSelectedColor(event?.target.value, true)} />)}
         </div>
         <hr></hr>
-        <input type="submit" name="return" value="Guardar y crear una nueva asignatura"></input>
-        <input type="submit" name="return" value="Guardar y avanzar a propuestas"></input>
-        <input type="submit" name="return" value="Guardar e importar fichero con eventos"></input>
+        {errorStudyHours && <p className="error">El tamaño de las sesiones debe ser menor que el número de horas de estudio</p>}
+        <input type="submit" name="return" value="Guardar e importar fichero con eventos" disabled={errorStudyHours}></input>
+        <input type="submit" name="return" value="Guardar y avanzar a propuestas" disabled={errorStudyHours}></input>
+        
+
       </form>
       <footer>
         {data?.message && <p>{data.message}</p>}
