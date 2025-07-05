@@ -83,27 +83,28 @@ export default function SubjectReview() {
 
   const actualDay = (new Date().getUTCDay() + 6) % 7;
   const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-
-  const colors = [ "red", "blue", "white"];
-  let i = -1;
+  const pendingHours = [];
 
   if (studyBlocks.length > 0) {
-    studyBlocks.map((block) => {
-    const date = new Date(block.date);
-      let dayOfWeek = (date.getUTCDay() + 6) % 7;
-      if(actualDay == dayOfWeek){
-        i++;
-        const object = {
-        label: "",
-        data: [0],
-        backgroundColor: colors[i],
-      }
-      object.label = block.name;      
-      object.data.splice(dayOfWeek, 0, block.completed);
-      datasets.push(object);
-      }
-      
+    subjects.map((subject) => {
+      studyBlocks.map((block) => {
+        const date = new Date(block.date);
+        let dayOfWeek = (date.getUTCDay() + 6) % 7;
+        if (actualDay == dayOfWeek) {
+          const object = {
+            label: "",
+            data: [],
+            backgroundColor: subject.id === block.subjectId ? subject.color : "",
+          }
+          object.label = block.name;
+          object.data.push(block.completed);
+          object.backgroundColor !== "" ? datasets.push(object) : datasets.push();
+          object.backgroundColor !== "" ? pendingHours.push([block.name, (Number(block.time) * Number(block.completed)) / 100, block.time]) : pendingHours.push();
+        }
+
+      })
     })
+
   }
 
   const [data, setData] = useState({
@@ -117,8 +118,16 @@ export default function SubjectReview() {
         <h1>Studlendar - revisión diaria</h1>
       </header>
       <main>
-        <div className='chart-container'>
-          <Bar options={options} data={data} style={{ height: "800px", margin: "auto" }} />
+        <h2>Gráfico con los bloques de estudio completados en el día de hoy (valores en porcentaje):</h2>
+        <div className='chart-container' style={{ position: "relative", height: "60vh", width: "90vw" }}>
+          <Bar options={options} data={data}  style={{ margin: "auto", height: "60vh", width: "90vw" }} />
+        </div>
+        <div className='stats-container'>
+          <h2>Estadísticas del día de hoy</h2>
+          {pendingHours.map(([blockName, hours, time]) => (
+            // eslint-disable-next-line react/jsx-key
+            <p>Del bloque de estudio "{blockName}" se han completado: {hours} / {time} horas </p>
+          ))}
         </div>
       </main>
       <footer>

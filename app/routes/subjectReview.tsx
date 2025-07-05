@@ -81,30 +81,26 @@ export default function SubjectReview() {
   const { subjects, studyBlocks } = useLoaderData();
   const datasets: { label: string; data: number[]; backgroundColor: string; }[] = [];
 
-  if (subjects.length > 0) {
+  if (studyBlocks.length > 0) {
     subjects.map((subject) => {
-      const object = {
-        label: "",
-        data: [0, 0, 0, 0, 0, 0, 0],
-        backgroundColor: "red",
-      }
-      object.label = subject.name;
+      studyBlocks.map((block) => {
+        const object = {
+          label: "",
+          data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          backgroundColor: subject.id === block.subjectId ? subject.color : "",
+        }
+        object.label = block.name;
 
-      if (studyBlocks.length > 0) {
-        studyBlocks.map((block) => {
-          if (block.subjectId == subject.id) {
-            const date = new Date(block.date);
-            let dayOfWeek = (date.getUTCDay() + 6) % 7;
-            object.data.splice(dayOfWeek, 0, block.completed);
-          }
-        })
-      }
-      datasets.push(object);
+        const date = new Date(block.date);
+        let day = date.getDate() - 1;
+        object.data.splice(day, 0, block.completed);
+        object.backgroundColor !== "" ? datasets.push(object) : datasets.push();
+      })
     })
   }
 
   const [data, setData] = useState({
-    labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
+    labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31],
     datasets: datasets,
   });
 
@@ -114,8 +110,9 @@ export default function SubjectReview() {
         <h1>Studlendar - revisión por asignatura</h1>
       </header>
       <main>
-        <div className='chart-container'>
-          <Bar options={options} data={data} style={{ height: "800px", margin: "auto" }} />
+        <h2>Estadísticas por asignatura, período mensual (valores en porcentaje):</h2>
+        <div className='chart-container' style={{position: "relative", height:"75vh", width:"100vw"}}>
+          <Bar options={options} data={data} style={{ margin: "auto", height:"75vh", width:"100vw"}}/>
         </div>
       </main>
       <footer>

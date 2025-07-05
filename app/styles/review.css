@@ -1,15 +1,112 @@
+body{
+  overflow-x: hidden;
+}
+
+h1, h2{
+  text-align: center;
+}
+
+h3{
+  color: #023e8a;
+}
+
+.chart-container{
+  position: "relative";
+  margin: auto;
+}
+
+.container{
+  display: flex;
+  flex-flow: row;
+  width: auto;
+  justify-content: space-evenly;
+  margin-top: 10px;
+}
+
+.proposalsContainer{
+  background-color: white;
+  border-radius: 10px;
+  width: fit-content;
+  padding: 10px;
+  font-size: 1.15rem;
+}
+
+.subjectContainer{
+  background-color: white;
+  border-radius: 10px;
+  width: fit-content;
+  padding: 10px;
+  font-size: 1.15rem;
+}
+
+.subjectContainer h2{
+  margin-bottom: 20px;
+}
+
+.subjectContainer form{
+  display: flex;
+  flex-wrap: wrap;
+  width: 570px;
+  justify-content: space-between;
+}
+
+.subjectContainer form > label,
+.subjectContainer form > input,
+.subjectContainer form > span{
+  width: 33%;
+  text-align: center;
+}
+
+.subjectContainer input[type="submit"]{
+  width: fit-content;
+  margin: 10px auto;
+  background-color: white;
+  border: 1px solid #023e8a;
+  border-radius: 5px;
+  color: #023e8a;
+  font-size: 1.15rem;
+}
+
+.subjectContainer input[type="submit"]:hover{
+  background-color: #023e8a;
+  color: white;
+  cursor: pointer;
+}
+
+.subjectContainer__label{
+  margin-bottom: 10px;
+}
+
+.subjectContainer__input{
+  margin-bottom: 20px;
+  margin: auto;
+  width: 200px;
+}
+
+.stats-container{
+  text-align: center;
+  background-color: white;
+  color: #023e8a;
+  margin: auto;
+  width: fit-content;
+  padding: 10px;
+  border-radius: 10px;
+}
+
 footer{
-    margin: 20px;
+  margin: 20px;
+  padding-bottom: 20px;
+  text-align: center;
 }
 
 footer a{
   border: 1px solid #023e8a;
   border-radius: 10px;
-  margin: 10px;
   background-color: white;
   color:  #023e8a;
   text-decoration: none;
   padding: 5px;
+  font-size: 1.15rem;
 }
 
 footer a:hover{
