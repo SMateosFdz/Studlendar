@@ -5,7 +5,6 @@ export interface StudyBlock {
   subjectId: string;
   subjectName: string;
   time: string;
-  repetition: string;
   date: string;
   notes: string;
   completed: number;
