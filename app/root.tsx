@@ -50,7 +50,7 @@ export function ErrorBoundary() {
       <Links />
     </head>
     <body>
-      <div>
+      <div className="error">
         <h1>
           Studlendar
         </h1>
@@ -64,7 +64,7 @@ export function ErrorBoundary() {
     </body>
   </html>);
 
-  if (error.message.includes("sesión")) {
+  if (error.message?.includes("sesión")) {
     contentError = (<html>
       <head>
         <title>Oh no!</title>
@@ -72,7 +72,7 @@ export function ErrorBoundary() {
         <Links />
       </head>
       <body>
-        <div>
+        <div className="error">
           <h1>
             Studlendar
           </h1>
