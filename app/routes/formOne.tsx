@@ -14,7 +14,7 @@ export const meta: MetaFunction = () => {
 
 export default function FormOne() {
   const daysWeek: { id: string; checked: boolean }[] = [];
-  const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+  const days = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"];
 
   const createInitialDays = () => {
     days.map((day) => {
@@ -50,33 +50,33 @@ export default function FormOne() {
         <Form method="post">
           <label>Elige los días en los que quieres bloques de estudio: </label>
           <fieldset className="days-btn-container">
-            <input className="day-btn" id="monday" type="checkbox" onChange={() => handleCheckboxChange("monday")} />
-            <label className="day-label" htmlFor="monday">L</label>
+            <input className="day-btn" id="lunes" type="checkbox" onChange={() => handleCheckboxChange("lunes")} />
+            <label className="day-label" htmlFor="lunes">L</label>
 
-            <input className="day-btn" id="tuesday" type="checkbox" onChange={() => handleCheckboxChange("tuesday")} />
-            <label className="day-label" htmlFor="tuesday">M</label>
+            <input className="day-btn" id="martes" type="checkbox" onChange={() => handleCheckboxChange("martes")} />
+            <label className="day-label" htmlFor="martes">M</label>
 
-            <input className="day-btn" id="wednesday" type="checkbox" onChange={() => handleCheckboxChange("wednesday")} />
-            <label className="day-label" htmlFor="wednesday">X</label>
+            <input className="day-btn" id="miercoles" type="checkbox" onChange={() => handleCheckboxChange("miercoles")} />
+            <label className="day-label" htmlFor="miercoles">X</label>
 
-            <input className="day-btn" id="thursday" type="checkbox" onChange={() => handleCheckboxChange("thursday")} />
-            <label className="day-label" htmlFor="thursday">J</label>
+            <input className="day-btn" id="jueves" type="checkbox" onChange={() => handleCheckboxChange("jueves")} />
+            <label className="day-label" htmlFor="jueves">J</label>
 
-            <input className="day-btn" id="friday" type="checkbox" onChange={() => handleCheckboxChange("friday")} />
-            <label className="day-label" htmlFor="friday">V</label>
+            <input className="day-btn" id="viernes" type="checkbox" onChange={() => handleCheckboxChange("viernes")} />
+            <label className="day-label" htmlFor="viernes">V</label>
 
-            <input className="day-btn" id="saturday" type="checkbox" onChange={() => handleCheckboxChange("saturday")} />
-            <label className="day-label" htmlFor="saturday">S</label>
+            <input className="day-btn" id="sabado" type="checkbox" onChange={() => handleCheckboxChange("sabado")} />
+            <label className="day-label" htmlFor="sabado">S</label>
 
-            <input className="day-btn" id="sunday" type="checkbox" onChange={() => handleCheckboxChange("sunday")} />
-            <label className="day-label" htmlFor="sunday">D</label>
+            <input className="day-btn" id="domingo" type="checkbox" onChange={() => handleCheckboxChange("domingo")} />
+            <label className="day-label" htmlFor="domingo">D</label>
           </fieldset>
           <hr></hr>
           {checkedDays.map((day) => {
             if (day.checked) {
               return (
                 <>
-                  <label htmlFor={`momento-${day.id}`} id={`momento-${day.id}`}>¿En qué momento del día prefieres los bloques de estudio para el {day.id.id}?</label>
+                  <label htmlFor={`momento-${day.id}`} id={`momento-${day.id}`}>¿En qué momento del día prefieres los bloques de estudio para el {day.id}?</label>
                   <fieldset id={`momento-${day.id}`}>
                     <input type="checkbox" id={`mañana-${day.id}`} name={`mañana-${day.id}`}></input>
                     <label htmlFor={`mañana-${day.id}`}>Mañana</label>
@@ -105,13 +105,13 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const intent = formData.get("move");
   let preferences = {
-    "monday": [],
-    "tuesday": [],
-    "wednesday": [],
-    "thursday": [],
-    "friday": [],
-    "saturday": [],
-    "sunday": [],
+    "lunes": [],
+    "martes": [],
+    "miercoles": [],
+    "jueves": [],
+    "viernes": [],
+    "sabado": [],
+    "domingo": [],
   };
 
   formData.forEach((element, key) => {
