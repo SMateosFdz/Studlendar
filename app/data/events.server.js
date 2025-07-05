@@ -6,7 +6,6 @@ export async function addEvent(eventData) {
             id: eventData.id,
             blockId : eventData.blockId,
             name: eventData.name,
-            color: eventData.color,
             notes: eventData.notes,
             subject: {
                 connect: {id: eventData.subjectId},
@@ -31,10 +30,23 @@ export async function updateEvent(eventData) {
             data: {
             name: eventData.name,
             date: new Date(eventData.date),
-            repetition: eventData.repetition,
             time: eventData.time,
             completed: eventData.completed,
             }
+        });
+
+        return {ok: true};
+    } catch(error){
+        throw error;
+    }
+}
+
+export async function deleteEvent(eventData) {
+    try {
+        await prisma.event.delete({
+            where: {
+                id: eventData.id,
+            },
         });
 
         return {ok: true};

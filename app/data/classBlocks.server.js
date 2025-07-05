@@ -6,14 +6,12 @@ export async function addClassBlock(classBlockData) {
             id: classBlockData.id,
             blockId : classBlockData.blockId,
             name: classBlockData.name,
-            repetition: classBlockData.repetition,
             subject: {
                 connect: {id: classBlockData.subjectId},
             },
             subjectName: classBlockData.subjectName,
             time: classBlockData.time,
             date: new Date(classBlockData.date),
-            completed: classBlockData.completed,
             notes: classBlockData.notes,
         }});
 
@@ -32,12 +30,25 @@ export async function updateClassBlock(classBlockData) {
             data: {
             name: classBlockData.name,
             date: new Date(classBlockData.date),
-            repetition: classBlockData.repetition,
             time: classBlockData.time,
-            completed: classBlockData.completed,
+            notes: classBlockData.notes,
             }
         });
 
+        return {ok: true};
+    } catch(error){
+        throw error;
+    }
+}
+
+export async function deleteClassBlock(classBlockData) {
+    try {
+        await prisma.classBlock.delete({
+            where: {
+                id: classBlockData.id,
+            },
+        });
+        
         return {ok: true};
     } catch(error){
         throw error;

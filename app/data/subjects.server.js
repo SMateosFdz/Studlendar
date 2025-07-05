@@ -7,13 +7,12 @@ export async function addSubject(subjectData) {
             name: subjectData.name,
             hours: subjectData.hours,
             sessionSize: subjectData.sessionSize,
-            sessionOrg: subjectData.sessionOrg,
             initialDate: new Date(subjectData.initialDate),
             endDate: new Date(subjectData.endDate),
+            color: subjectData.color,
             author: {
                 connect: {nameUser: subjectData.author},
             },
-            
         }});
 
         return {ok: true};

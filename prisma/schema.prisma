@@ -20,6 +20,7 @@ model User {
   password String
   preferences Json? 
   subjects  Subject[]
+  reviews WeeklyReview[]
 }
 
 model Subject {
@@ -29,9 +30,9 @@ model Subject {
   name        String @unique
   hours String
   sessionSize    String
-  sessionOrg  String
   initialDate DateTime
   endDate     DateTime
+  color String
   StudyBlock StudyBlock[]
   ClassBlock ClassBlock[]
   Event Event[]
@@ -47,7 +48,6 @@ model StudyBlock {
   time String
   date DateTime
   notes String
-  repetition String
   completed Int
 }
 
@@ -61,8 +61,6 @@ model ClassBlock {
   time String
   date DateTime
   notes String
-  repetition String
-  completed Int
 }
 
 model Event {
@@ -72,8 +70,15 @@ model Event {
   subjectName String
   blockId String
   name String
-  color String
   date DateTime
   notes String
   completed Boolean
+}
+
+model WeeklyReview {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  author      User     @relation(fields: [authorId], references: [nameUser])
+  authorId    String @unique
+  date DateTime
+  satisfaction Json? 
 }

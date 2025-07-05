@@ -5,7 +5,6 @@ export async function addStudyBlock(studyBlockData) {
         await prisma.studyBlock.create({data: {
             id: studyBlockData.id,
             blockId : studyBlockData.blockId,
-            repetition: studyBlockData.repetition,
             name: studyBlockData.name,
             subject: {
                 connect: {id: studyBlockData.subjectId},
@@ -32,10 +31,24 @@ export async function updateStudyBlock(studyBlockData) {
             data: {
             name: studyBlockData.name,
             date: new Date(studyBlockData.date),
-            repetition: studyBlockData.repetition,
             time: studyBlockData.time,
             completed: studyBlockData.completed,
+            notes: studyBlockData.notes,
             }
+        });
+
+        return {ok: true};
+    } catch(error){
+        throw error;
+    }
+}
+
+export async function deleteStudyBlock(studyBlockData) {
+    try {
+        await prisma.studyBlock.delete({
+            where: {
+                id: studyBlockData.id,
+            },
         });
 
         return {ok: true};
