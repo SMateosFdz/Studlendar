@@ -17,12 +17,12 @@ import type { ClassBlock } from "~/interfaces/classblock";
 export async function loader({ request }: LoaderFunctionArgs) {
   const session = await getSession(request);
 
-  if(session.id == ""){
+  if(session.data.userId == ""){
     throw new Error("Error de sesión");
-  };
+  }
 
   const existingSubjects = await prisma.subject.findMany({
-    where: { authorId: session.id },
+    where: { authorId: session.data.userId },
   });
 
   const latestSubject = await prisma.subject.findMany({
@@ -33,22 +33,22 @@ export async function loader({ request }: LoaderFunctionArgs) {
   })
 
   const response = {
-    subjects: existingSubjects,
     latestSubject: latestSubject[0].name,
+    latestSubjectId: latestSubject[0].id,
   };
 
   return json(response);
 }
 
 export default function ImportICSFile() {
-  const { subjects, latestSubject } = useLoaderData();
+  const { latestSubject, latestSubjectId } = useLoaderData();
   const actionData = useActionData<{
     events?: { name?: string; start?: Date; end?: Date, duration?: number }[];
     error?: string;
   }>();
   const initialEvents: { id: string; checked: boolean }[] = [];
   const [currentSelection, setCurrentSelection] = useState(latestSubject);
-  const [currentIdSelection, setCurrentIdSelection] = useState("");
+  const [currentIdSelection, setCurrentIdSelection] = useState(latestSubjectId);
   const [isChecked, setIsChecked] = useState(initialEvents);
 
   if (actionData?.events && actionData.events.length > 0) {
@@ -68,11 +68,6 @@ export default function ImportICSFile() {
       )
     );
   };
-
-  function handleSelectionChange(e: any) {
-    setCurrentSelection(e.target.value.split("-")[0]);
-    setCurrentIdSelection(e.target.value.split("-")[1]);
-  }
 
   let eventIndex = -1;
   let blockIndex = -1;
@@ -110,20 +105,8 @@ export default function ImportICSFile() {
             <Form method="post" name="eventsForm" id="eventsForm">
               <input type="hidden" id="form" name="form" value="events"></input>
               <input type="hidden" id="subjectId" name="subjectId" value={currentIdSelection}></input>
-              <input></input>
-              <label htmlFor="subjectName">Asignatura:</label>
-              <select
-                name="subjectName"
-                id="subjectName"
-                value={currentSelection}
-                onChange={handleSelectionChange}
-              >
-                {subjects.map((subject: any) => (
-                  <option key={subject.name} value={subject.name + "-" + subject.id}>
-                    {subject.name}
-                  </option>
-                ))}
-              </select>
+              <input type="hidden" id="subjectName" name="subjectName" value={currentSelection}></input>
+              <p>Eventos y bloques de clase para la asignatura: {latestSubject}</p>
               <div className="all-container">
                 <div className="events-container">
                   <h3>Eventos:</h3>
@@ -146,7 +129,7 @@ export default function ImportICSFile() {
                                 handleCheckboxChange(index.toString())
                               }
                             ></input>
-                            <input type="hidden" id={`event-${eventIndex.toString()}`} name={`event-${eventIndex.toString()}`} value={event.name}></input>
+                            <input type="hidden" id={`eventName-${eventIndex.toString()}`} name={`eventName-${eventIndex.toString()}`} value={event.name}></input>
                           </div>
                           <div className="event-datetime">
                             Comienzo: {event.start ?? "N/A"}
@@ -181,7 +164,7 @@ export default function ImportICSFile() {
                               handleCheckboxChange(index.toString())
                             }
                           ></input>
-                          <input type="hidden" id={`block-${blockIndex.toString()}`} name={`block-${blockIndex.toString()}`} value={event.name}></input>
+                          <input type="hidden" id={`blockName-${blockIndex.toString()}`} name={`blockName-${blockIndex.toString()}`} value={event.name}></input>
                         </div>
                         <div className="event-datetime">
                           Comienzo: {event.start ?? "N/A"}
@@ -189,7 +172,7 @@ export default function ImportICSFile() {
                         </div>
                         <div className="event-datetime">
                           Duración: {event.duration ?? "N/A"}
-                          <input type="hidden" id={`blockDuration-${blockIndex}`} name={`blockDuration-${blockIndex}`} value={event.start}></input>
+                          <input type="hidden" id={`blockDuration-${blockIndex}`} name={`blockDuration-${blockIndex}`} value={event.duration}></input>
                         </div>
                         <div className="event-datetime">
                           Fin: {event.end ?? "N/A"}
@@ -250,9 +233,9 @@ export const action: ActionFunction = async ({ request }) => {
     });
 
     chosenEvents.forEach((i , index) => {
-      const eventName = formData.get("event-" + index)?.toString();
-      const eventDate = formData.get(`eventEndDate-` + index)?.toString();
-      const subjectName = formData.get("subjectName");
+      const eventName = formData.get("eventName-" + index)?.toString();
+      const eventDate = formData.get(`eventEndDate-` + index)?.toString().replace(".000", "");
+      const subjectName = formData.get("subjectName")?.toString();
       const subjectId = formData.get("subjectId")?.toString();
 
       const { hours, dayOfWeek } = getDateValues(eventDate);
@@ -272,15 +255,15 @@ export const action: ActionFunction = async ({ request }) => {
       };
 
       event.id = event.subjectName + event.date;
-
+      console.log(event);
       addEvent(event);
     });
 
     chosenBlocks.forEach((i , index) => {
-      const blockName = formData.get("block-" + index)?.toString();
-      const blockDate = formData.get(`blockEndDate-` + index)?.toString();
+      const blockName = formData.get("blockName-" + index)?.toString();
+      const blockDate = formData.get(`blockStartDate-` + index)?.toString().replace(".000", "");
       const duration = formData.get(`blockDuration-` + index)?.toString();
-      const subjectName = formData.get("subjectName");
+      const subjectName = formData.get("subjectName")?.toString();
       const subjectId = formData.get("subjectId")?.toString();
 
       const { hours, dayOfWeek } = getDateValues(blockDate);
@@ -301,11 +284,11 @@ export const action: ActionFunction = async ({ request }) => {
       };
 
       block.id = block.subjectName + block.date;
-
+      console.log(block);
       addClassBlock(block);
     })
 
-    return redirect("/configurationForm");
+    return redirect("/createSubject");
   }
 
 };
