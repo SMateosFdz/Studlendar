@@ -135,7 +135,6 @@ hr{
 
 .day-btn:checked + .day-label {
   background-color: white;
-  //background-image: linear-gradient(147deg, #00ccff 0%, #004cff 74%);
   border: none;
   color: #023E8A;
 }

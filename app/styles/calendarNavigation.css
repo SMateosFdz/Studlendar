@@ -132,7 +132,7 @@
   }
 }
 
-@media screen and (max-width: 1200px) {
+@media screen and (max-width: 1200px), (max-height: 800px) {
   #full-navigation {
     display: none;
   }
