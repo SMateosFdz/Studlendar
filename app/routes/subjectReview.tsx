@@ -14,7 +14,7 @@ import type { LoaderFunctionArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { prisma } from '~/data/database.server';
 import { getSession } from '~/sessions.server';
-import { filterDates } from '~/utils/filterDates';
+import { filterDatesByMonth } from '~/utils/filterDates';
 import styles from "~/styles/review.css";
 
 ChartJS.register(
@@ -64,7 +64,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   existingStudyBlocks.push(...allStudyBlocks.flat());
 
-  existingStudyBlocks = filterDates(existingStudyBlocks, new Date());
+  existingStudyBlocks = filterDatesByMonth(existingStudyBlocks, new Date());
 
   const response = {
     subjects: existingSubjects,
@@ -80,6 +80,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function SubjectReview() {
   const { subjects, studyBlocks } = useLoaderData();
   const datasets: { label: string; data: number[]; backgroundColor: string; }[] = [];
+  let days = 0;
 
   if (studyBlocks.length > 0) {
     subjects.map((subject) => {
@@ -93,6 +94,7 @@ export default function SubjectReview() {
 
         const date = new Date(block.date);
         let day = date.getDate() - 1;
+        days = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
         object.data.splice(day, 0, block.completed);
         object.backgroundColor !== "" ? datasets.push(object) : datasets.push();
       })
@@ -100,7 +102,7 @@ export default function SubjectReview() {
   }
 
   const [data, setData] = useState({
-    labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31],
+    labels: Array.from({length: days}, (_,i) => i + 1),
     datasets: datasets,
   });
 
