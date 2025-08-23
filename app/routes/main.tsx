@@ -19,6 +19,10 @@ import type { Event } from "~/interfaces/event";
 import { getCurrentDate, getDateValues, getDaysOfWeek, getWeekNumber } from "~/utils/date";
 import Pomodoro from "./pomodoro";
 
+/**
+ * Loader function of the main page
+ * @returns response object with subjects, class blocks, study blocks and events
+ */
 export async function loader({ request }: LoaderFunctionArgs) {
   const session = await getSession(request);
   const existingSubjects = await prisma.subject.findMany({
@@ -65,8 +69,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     classBlocks: existingClassBlocks,
   };
 
-  console.log("prueba");
-
   return json(response);
 }
 
@@ -92,12 +94,20 @@ export default function Main() {
   const [creatingDate, setCreatingDate] = useState("");
   const [nameError, setNameError] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [reviewValue, setReviewValue] = useState("");
 
   const formTypes = ["Evento", "Bloque de estudio", "Bloque de clase"];
   const [selectedType, setSelectedType] = useState(0);
 
-  function handleBlockClick(blockId: any, e: MouseEvent, type: number) {
-    e.stopPropagation();
+  /**
+   * Function to handle the click on a block from the calendar
+   * 
+   * @param blockId in the grid of the calendar
+   * @param event - mouse click event 
+   * @param type - type of block (class or study)
+   */
+  function handleBlockClick(blockId: any, event: MouseEvent, type: number) {
+    event.stopPropagation();
     setEditingBlock(true);
     setEditingId(blockId);
     setTypeBlock(true);
@@ -106,6 +116,11 @@ export default function Main() {
     setCurrentIdSelection(selectedValues[blockId] || subjects[0].id);
   }
 
+  /**
+   * Function to handle the click on a empty block of the grid
+   * 
+   * @param blockId in the grid of the calendar
+   */
   function handleGridBlockClick(blockId: any) {
     setEditingBlock(true);
     setEditingId(blockId);
@@ -114,6 +129,11 @@ export default function Main() {
     setCurrentIdSelection(selectedValues[blockId] || subjects[0].id);
   }
 
+  /**
+   * Function to handle the click on an event of the grid
+   * 
+   * @param blockId in the grid of the calendar
+   */
   function handleEventClick(blockId: any) {
     setEditingBlock(true);
     setEditingId(blockId);
@@ -123,11 +143,11 @@ export default function Main() {
     setCurrentIdSelection(selectedValues[blockId] || subjects[0].name);
   }
 
-  useEffect(() => {
+  /* useEffect(() => { //TODO improve the useEffect or change it for other function
     setCurrentEvents(events);
     setcurrentStudyBlocks(studyBlocks);
     setCurrentClassBlocks(classBlocks);
-  }, [events, studyBlocks, classBlocks])
+  }, [events, studyBlocks, classBlocks]) */
 
   // When form selection changes, update currentSelection state
   function handleSelectionChange(e: any) {
@@ -145,6 +165,7 @@ export default function Main() {
         break;
     }
   }
+
   // When form is submitted, update the stored block value and close form
   function handleFormSubmit() {
     setSelectedValues((prev) => ({
@@ -159,11 +180,19 @@ export default function Main() {
     setHoursFlag(true);
   }
 
+  /**
+   * Function to change between calendar and study modes
+   */
   function handleModeChange() {
     setIsToggledMode(!isToggledMode);
     window.scrollTo(0, 0);
   }
 
+  /**
+   * Function to handle the change of date in a block
+   * 
+   * @param event 
+   */
   function handleDateChange(event) {
     const date = new Date(event.target.value);
     setCreatingDate(event.target.value + ":00");
@@ -182,6 +211,11 @@ export default function Main() {
     !flag ? setNameError("") : setNameError("Error en el nombre del bloque, ya existe uno con el mismo nombre");
   }
 
+  /**
+   * Function to handle the change of date in a block
+   * 
+   * @param event 
+   */
   function handleComprobation() {
     const currentDays = getDaysOfWeek(new Date());
     const dayIndex = Number(editingId) % 8;
@@ -200,6 +234,15 @@ export default function Main() {
     !flag ? setNameError("") : setNameError("Error en el nombre del bloque, ya existe uno con el mismo nombre");
   }
 
+  /**
+   * Function to handle the different popups of the calendar
+   * 
+   * Example: creation or information popups
+   * 
+   * @param id 
+   * @param offset 
+   * @returns HTML with the proper popup and information
+   */
   function handlePopup(id: number, offset: number) {
     let form;
     let subject, name, time, date = "";
@@ -467,6 +510,7 @@ export default function Main() {
             <input type="hidden" aria-hidden="true" name="type" value={formTypes[selectedType] + " u"} />
             <input type="hidden" aria-hidden="true" name="date" value={date} />
             <input type="hidden" aria-hidden="true" name="subjectName" value={subject} />
+            <input type="hidden" aria-hidden="true" name="origName" value={name} />
             <label htmlFor="name">Nombre del bloque:</label>
             <input type="text" id="name" name="name" placeholder={name}></input>
             <hr></hr>
@@ -556,11 +600,23 @@ export default function Main() {
     }
   }
 
-  function handleReviewSelection(e: any) {
-    const form = document.getElementsByClassName("nav-item-form")[0] as HTMLFormElement;
+  /**
+   * Function to handle the review selection
+   * 
+   * @param e 
+   */
+  function handleReviewSelection(e) {
+    setReviewValue(e.target.value);
+    const form = e.target.form;
     form.submit();
   }
 
+  /**
+   * Function to handle the change of the week,
+   * revealing the new events and blocks in the calendar
+   * 
+   * @param offset - number that allows to show the proper week, back and forth in time
+   */
   function changeWeek(offset: number) {
     setCurrentOffset(currentOffset + offset);
     const newStart = new Date(currentWeekStart);
@@ -572,6 +628,11 @@ export default function Main() {
     setCurrentWeek(getWeekNumber(newStart));
   }
 
+  /**
+   * Function to handle the close of the popups
+   * 
+   * It also resets the form values
+   */
   function handleClose() {
     setEditingBlock(false);
     setCompletedValue(0);
@@ -579,6 +640,9 @@ export default function Main() {
     form.reset();
   }
 
+  /**
+   * Function to handle the open and close of the navigation when it is collapsed
+   */
   function handleNavOpen() {
     setIsOpen(!isOpen);
   }
@@ -610,8 +674,14 @@ export default function Main() {
     hour12: false,
   });
 
+  // Calculate if there is a study block when the study mode is being used
   const { flag, blockName } = Calculate(studyBlocks, getCurrentDate().hours, getCurrentDate().dayOfWeek);
 
+  /**
+   * Function to set the proper border depending on the percentage of completion
+   * @param value percentage of completion as a number between 0 and 100
+   * @returns border color
+   */
   function setBorder(value: string){
     let border = "";
     switch(value){
@@ -639,6 +709,11 @@ export default function Main() {
     return border;
   }
 
+  /**
+   * Function to set the proper background color for each of the study blocks
+   * @param value the hex number of the color
+   * @returns background color
+   */
   function setBackgroundColor(value: string){
     let color = "";
     subjects.map((subject: { id: any; color: string; }) => {
@@ -716,8 +791,13 @@ export default function Main() {
             </li>
             <li className="nav-item-smallWidth">
               <Form method="post" className="nav-item-form">
-                <select onChange={handleReviewSelection} id="review" name="review">
-                  <option selected disabled>Revisar</option>
+                <select
+                  id="review"
+                  name="review"
+                  value={reviewValue}
+                  onChange={handleReviewSelection}
+                >
+                  <option value="" disabled>Revisar</option>
                   <option value={"daily"}>Diaria</option>
                   <option value={"weekly"}>Semanal</option>
                   <option value={"subject"}>Por asignatura</option>
@@ -914,6 +994,7 @@ export default function Main() {
 
 }
 
+//TODO separate the logic to another function and reduce code complexity
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const offset = Number(formData.get("weekOffset")?.toString()) || 0;
@@ -923,9 +1004,9 @@ export async function action({ request }: ActionFunctionArgs) {
   const review = formData.get("review")?.toString() || "";
   const del = formData.get("delete")?.toString() || "";
 
-  console.log("input: ", formData.get("name")?.toString());
-  console.log("input: ", formData.get("completed")?.toString());
-
+  /**
+   * Redirection to the different reviews
+   */
   if (review !== "") {
     switch (review) {
       case "daily":
@@ -945,7 +1026,6 @@ export async function action({ request }: ActionFunctionArgs) {
     name: "",
     subjectId: "",
     subjectName: "",
-    repetition: "",
     time: "",
     date: "",
     completed: 0,
@@ -959,7 +1039,6 @@ export async function action({ request }: ActionFunctionArgs) {
     subjectId: "",
     subjectName: "",
     time: "",
-    repetition: "",
     date: "",
     completed: 0,
     notes: ""
@@ -977,6 +1056,9 @@ export async function action({ request }: ActionFunctionArgs) {
     completed: false,
   };
 
+  /**
+   * Deletion of items
+   */
   if (del !== "") {
     switch (formData.get("type")?.toString()) {
       case "Evento u":
@@ -986,7 +1068,6 @@ export async function action({ request }: ActionFunctionArgs) {
           const dayIndex = Number(event.blockId) % 8;
           const startHour = (Number(event.blockId) - dayIndex - 24) / 8;
           const minutes = formData.get("datetime")?.toString().split(":")[1];
-          console.log(datesOfWeek[dayIndex - 1]);
           const year = datesOfWeek[dayIndex - 1].toString().split("-")[0];
           const month = datesOfWeek[dayIndex - 1].toString().split("-")[1];
           const date = year + "-" + month.toString().padStart(2, "0") + "-" + currentDays[dayIndex - 1].toString().padStart(2, "0") + "T" + startHour.toString().padStart(2, "0") + ":" + minutes?.padStart(2, "0") + ":00Z";
@@ -1037,6 +1118,9 @@ export async function action({ request }: ActionFunctionArgs) {
     return null;
   }
 
+  /**
+   * Creation or update of items
+   */
   switch (formData.get("type")?.toString()) {
     case "Evento c":
       event.name = formData.get("blockName")?.toString() || "";
@@ -1064,7 +1148,6 @@ export async function action({ request }: ActionFunctionArgs) {
         event.blockId = blockId.toString();
       }
       event.id = event.subjectName + event.date.replace(".000", "");
-      console.log(currentDays);
       addEvent(event);
       break;
 
@@ -1124,7 +1207,7 @@ export async function action({ request }: ActionFunctionArgs) {
       break;
 
     case "Evento u":
-      event.name = formData.get("name")?.toString() || "";
+      formData.get("name")?.toString() != "" ? event.name = formData.get("name")?.toString() : event.name = formData.get("origName")?.toString();
       event.color = formData.get("color")?.toString() || "";
       event.notes = formData.get("notes")?.toString() || "";
       event.subjectName = formData.get("subjectName")?.toString().split("-")[0] || "";
@@ -1154,8 +1237,8 @@ export async function action({ request }: ActionFunctionArgs) {
       break;
 
     case "Bloque de estudio u":
+      formData.get("name")?.toString() != "" ? studyBlock.name = formData.get("name")?.toString() : studyBlock.name = formData.get("origName")?.toString();
       studyBlock.blockId = formData.get("id")?.toString() || "";
-      studyBlock.name = formData.get("name")?.toString() || "";
       studyBlock.subjectName = formData.get("subjectName")?.toString().split("-")[0] || "";
       studyBlock.time = formData.get("time")?.toString() || "";
       studyBlock.completed = Number(formData.get("completed")?.toString()) || 0;
@@ -1179,13 +1262,12 @@ export async function action({ request }: ActionFunctionArgs) {
         studyBlock.blockId = blockId.toString();
       }
       studyBlock.id = studyBlock.subjectName + studyBlock.date.replace(".000", "");
-      console.log(studyBlock);
       updateStudyBlock(studyBlock);
       break;
 
     case "Bloque de clase u":
+      formData.get("name")?.toString() != "" ? classBlock.name = formData.get("name")?.toString() : classBlock.name = formData.get("origName")?.toString();
       classBlock.blockId = formData.get("id")?.toString() || "";
-      classBlock.name = formData.get("name")?.toString() || "";
       classBlock.subjectName = formData.get("subjectName")?.toString().split("-")[0] || "";
       const minutes = formData.get("date")?.toString().split(":")[1];
       classBlock.time = formData.get("time")?.toString() || "";

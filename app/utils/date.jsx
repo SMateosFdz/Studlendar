@@ -8,6 +8,12 @@ export function getCurrentDate() {
   return { month, hours, minutes, seconds, dayOfWeek};
 }
 
+/**
+ * Function to get some of the values of a specific date
+ * 
+ * @param {Date} date 
+ * @returns year, month, day, hours, minutes, seconds and day of week
+ */
 export function getDateValues(date){
   if(date.slice(-1) === "Z"){
     date = date.substring(0, date.length - 1);
@@ -27,6 +33,12 @@ export function getDateValues(date){
   return { year, month, day, hours, minutes, seconds, dayOfWeek};
 }
 
+/**
+ * Function to parse a date in ICS format to a date string
+ * 
+ * @param {Date} icsDate date in ICS format
+ * @returns date string
+ */
 export function parseDate(icsDate) {
   const part1 = +icsDate.slice(0, 4);
   const part2 = +icsDate.slice(4, 6);
@@ -39,6 +51,14 @@ export function parseDate(icsDate) {
   return dateString;
 }
 
+/**
+ * Function to get the current month days and dates of a specific date
+ * 
+ * Example: 06/08/2025 returns [[4,5,6,...,10], [04/08/2025,...,10/08/2025]]
+ * 
+ * @param {Date} currentDate 
+ * @returns List of two lists with the month days and dates
+ */
 export function getDaysOfWeek(currentDate){
   const date = new Date(currentDate);
   const dayOfWeek = (date.getDay() + 6) % 7;
@@ -58,6 +78,11 @@ export function getDaysOfWeek(currentDate){
   return [monthNumbers, datesOfWeek];
 }
 
+/**
+ * Function to get the current week number of the year
+ * @param {Date} currentDate 
+ * @returns week number of the year
+ */
 export function getWeekNumber(currentDate){
   const week = new Date(currentDate);
   week.setDate(week.getDate() + 4 - (week.getDay() || 7));

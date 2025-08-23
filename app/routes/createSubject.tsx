@@ -35,6 +35,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return json(classBlocks);
 }
 
+// Default colors to choose for the subjects
 const colors = [
   { label: 'Grey', value: '#CCCCCC' },
   { label: 'Yellow', value: '#F1C40F' },
@@ -77,10 +78,6 @@ export default function CreateSubject() {
       }
     }
   }
-
-  /* functionHandleDates(event){
-    
-  } */
 
   return (
     <>

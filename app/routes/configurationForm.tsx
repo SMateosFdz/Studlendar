@@ -79,12 +79,14 @@ export async function action({ request }: ActionFunctionArgs) {
   let selected = await Promise.all(values);
   selectedValues.push(...selected.flat());
 
+  // Verification of subjects with no study blocks
   selectedValues.forEach((value) => {
     if(value){
       flag = true;
     }
   })
 
+  // If there is a subject with no study blocks redirects to proposals route
   if (flag) {
     return redirect("/proposals");
   } else {

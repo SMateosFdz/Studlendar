@@ -47,7 +47,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const allUser = await prisma.user.findMany();
   const userData = Object.fromEntries(formData);
 
-  const bcrypt = require('bcryptjs');
+  const bcrypt = require('bcryptjs'); // bycrpt protects and encrypts the passwords
 
   for (var nameComprobation of allUser) {
     if (userData.nameUser.toString() === nameComprobation.nameUser) {
@@ -62,7 +62,7 @@ export async function action({ request }: ActionFunctionArgs) {
           where: { authorId: user?.nameUser },
         });
 
-        if(allSubjects.length > 0){
+        if(allSubjects.length > 0){ // if there's 1 or more subjects, skips the initial form
           return createUserSession({
             request,
             userId: userData.nameUser.toString(),

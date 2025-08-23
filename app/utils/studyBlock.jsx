@@ -1,3 +1,12 @@
+/**
+ * Function to calculate if there is a block in a specific hour of a day
+ * 
+ * @param {List} blocks study blocks of the user
+ * @param {int} hours current hour
+ * @param {int} day current day 
+ * 
+ * @returns boolean flag and block name
+ */
 export function Calculate(blocks, hours, day){
     let flag = false;
     let blockName = "";
