@@ -11,7 +11,7 @@
   "dependencies": {
     "@prisma/client": "^6.8.2",
     "@remix-run/node": "^2.0.0-pre.8",
-    "@remix-run/react": "^2.0.0-pre.8",
+    "@remix-run/react": "^2.17.3",
     "@remix-run/serve": "^2.0.0-pre.8",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
